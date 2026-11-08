@@ -26,3 +26,36 @@
     if(!still)requestAnimationFrame(draw)}
   size();addEventListener('resize',size);draw(0);
 })();
+
+(function(){
+  var ar=(document.documentElement.lang||'ar')==='ar';
+  var T=ar?{fab:'اسأل نوفا',title:'نوفا، مساعدك الذكي',sub:'يقترح لك الجهاز المناسب من مختاراتنا',hi:'أهلاً 👋 أنا نوفا. أخبرني ماذا تحتاج (للتدريس، للسفر، للاستماع...) وميزانيتك تقريباً، وأقترح لك الأنسب.',ph:'اكتب سؤالك…',send:'إرسال',chips:['سماعة جيدة للحصص عن بعد','ماذا أحتاج للسفر؟','هل بطاقة RFID مفيدة فعلاً؟'],err:'تعذّر الرد الآن. جرّب بعد قليل.',rate:'وصلت إلى الحد المؤقت للأسئلة، جرّب بعد دقائق.',fine:'قد يخطئ المساعد. السعر النهائي على علي إكسبريس.'}
+          :{fab:'Ask Nova',title:'Nova, your smart assistant',sub:'Finds the right gear from our picks',hi:'Hi 👋 I am Nova. Tell me what you need (teaching, travel, listening...) and a rough budget, and I will suggest the best fit.',ph:'Type your question…',send:'Send',chips:['Good earbuds for online classes','What do I need for travel?','Is an RFID card really useful?'],err:'No reply right now. Please try again shortly.',rate:'Question limit reached for now. Try again in a few minutes.',fine:'The assistant can make mistakes. Final price is on AliExpress.'};
+  var hist=[];try{hist=JSON.parse(sessionStorage.getItem('nova')||'[]')}catch(e){}
+  var star='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 L19 13 L31 16 L19 19 L16 31 L13 19 L1 16 L13 13 Z" fill="#E6B95B"/></svg>';
+  var fab=document.createElement('button');fab.className='nova-fab';fab.type='button';fab.innerHTML=star+'<span>'+T.fab+'</span>';fab.setAttribute('aria-expanded','false');
+  document.body.appendChild(fab);
+  var box=null,log,inp,busy=false;
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function fmt(s){s=esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    return s.replace(/(https?:\/\/[^\s)]+|\/(?:ar|en)\/(?:p\/[a-z0-9-]+\/|deals\/))/g,function(u){var ext=u.indexOf('http')===0;return '<a href="'+u+'"'+(ext?' target="_blank" rel="sponsored nofollow noopener"':'')+'>'+(ext?u:(ar?'افتح الصفحة':'Open page'))+'</a>'});}
+  function add(role,text,cls){var d=document.createElement('div');d.className='m '+(role==='user'?'u':'a')+(cls?' '+cls:'');d.innerHTML=role==='user'?esc(text):fmt(text);log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
+  function save(){try{sessionStorage.setItem('nova',JSON.stringify(hist.slice(-12)))}catch(e){}}
+  function send(q){q=(q||'').trim();if(!q||busy)return;busy=true;inp.value='';add('user',q);hist.push({role:'user',content:q});save();
+    var t=add('assistant','…','typing');
+    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:ar?'ar':'en',messages:hist})})
+      .then(function(r){return r.json().then(function(j){return{s:r.status,j:j}})})
+      .then(function(x){t.remove();if(x.j.reply){add('assistant',x.j.reply);hist.push({role:'assistant',content:x.j.reply});save();}else add('assistant',x.s===429?T.rate:T.err);})
+      .catch(function(){t.remove();add('assistant',T.err);}).then(function(){busy=false;inp.focus();});}
+  function open(){
+    if(box){box.hidden=!box.hidden;fab.setAttribute('aria-expanded',String(!box.hidden));if(!box.hidden)inp.focus();return;}
+    box=document.createElement('section');box.className='nova';box.setAttribute('aria-label',T.title);
+    box.innerHTML='<header>'+star.replace('<svg','<svg width="26" height="26"')+'<div><b>'+T.title+'</b><small>'+T.sub+'</small></div><button type="button" aria-label="close">×</button></header><div class="log" aria-live="polite"></div><div class="chips"></div><form><input id="nova-q" maxlength="600" autocomplete="off" placeholder="'+T.ph+'"><button type="submit">'+T.send+'</button></form><div class="fine">'+T.fine+'</div>';
+    document.body.appendChild(box);log=box.querySelector('.log');inp=box.querySelector('input');
+    add('assistant',T.hi);hist.forEach(function(m){add(m.role,m.content)});
+    var ch=box.querySelector('.chips');if(!hist.length)T.chips.forEach(function(c){var b=document.createElement('button');b.type='button';b.textContent=c;b.onclick=function(){ch.remove();send(c)};ch.appendChild(b)});
+    box.querySelector('header button').onclick=function(){box.hidden=true;fab.setAttribute('aria-expanded','false')};
+    box.querySelector('form').onsubmit=function(ev){ev.preventDefault();var c=box.querySelector('.chips');if(c)c.remove();send(inp.value)};
+    fab.setAttribute('aria-expanded','true');inp.focus();}
+  fab.addEventListener('click',open);
+})();
