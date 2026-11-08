@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DoniaNova</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="DoniaNova — smart gear for work, class and travel. Curated tech picks in Arabic and English.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=El+Messiri:wght@500;700&family=Readex+Pro:wght@300;400;500;600&display=swap">
+<style>
+/* Layout: night-sky masthead with a single nova star, then a filterable shelf of picks, guides, and an honest disclosure. */
+:root{
+  --bg:#F2F4F9; --surface:#FFFFFF; --ink:#141A33; --muted:#59617D; --line:#DCE0EC;
+  --night:#101634; --night-ink:#EEF0F8; --gold:#A8741C; --gold-soft:#F4E6C8; --chip:#E7EAF3;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-display-ar:"El Messiri","Readex Pro","Segoe UI",Tahoma,sans-serif;
+  --f-body:"Readex Pro","Segoe UI",Tahoma,system-ui,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0A0E22; --surface:#121834; --ink:#E9ECF7; --muted:#9AA2C0; --line:#242C4D;
+  --night:#060917; --night-ink:#EEF0F8; --gold:#E6B95B; --gold-soft:#2C2614; --chip:#1A2142; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0A0E22; --surface:#121834; --ink:#E9ECF7; --muted:#9AA2C0; --line:#242C4D;
+  --night:#060917; --night-ink:#EEF0F8; --gold:#E6B95B; --gold-soft:#2C2614; --chip:#1A2142; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+[dir="rtl"] h1,[dir="rtl"] h2,[dir="rtl"] h3,[dir="rtl"] .brand b{font-family:var(--f-display-ar)}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+
+/* Masthead */
+.mast{background:var(--night);color:var(--night-ink);position:relative;overflow:hidden}
+.mast canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.top{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand b{font-family:var(--f-display);font-size:22px;font-weight:800;letter-spacing:-.01em}
+.brand b span{color:#E6B95B}
+.lang{display:flex;border:1px solid rgba(238,240,248,.25);border-radius:999px;padding:3px}
+.lang button{background:none;border:0;color:var(--night-ink);padding:6px 14px;border-radius:999px;font-size:14px}
+.lang button[aria-pressed="true"]{background:#E6B95B;color:#101634;font-weight:600}
+.hero{position:relative;padding-block:40px 64px;display:grid;gap:18px;max-width:720px}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#E6B95B;font-weight:500}
+[dir="rtl"] .eyebrow{letter-spacing:0;font-size:14px}
+.hero h1{font-size:clamp(34px,6vw,60px);font-weight:800;letter-spacing:-.02em}
+[dir="rtl"] .hero h1{letter-spacing:0;line-height:1.3}
+.hero p{margin:0;font-size:18px;color:#C4C9DF;max-width:58ch}
+.pillars{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pillars span{font-size:14px;border:1px solid rgba(238,240,248,.22);padding:6px 12px;border-radius:999px;color:#DDE1F0}
+
+/* Shelf */
+section{padding-block:48px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.head h2{font-size:clamp(24px,3.4vw,34px)}
+.head p{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.filters button{border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 14px;border-radius:999px;font-size:14px}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card > div:last-child{margin-top:auto}
+.card .shot{width:100%;max-width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:var(--chip);display:block}
+.card .ic{width:44px;height:44px;border-radius:12px;background:var(--gold-soft);color:var(--gold);display:grid;place-items:center}
+.card .ic svg{width:24px;height:24px}
+.tag{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+[dir="rtl"] .tag{letter-spacing:0;font-size:13px}
+.card h3{font-size:18px;font-weight:700}
+[dir="rtl"] .card h3{font-size:19px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.best{font-size:13px;color:var(--ink);background:var(--chip);border-radius:8px;padding:6px 10px;align-self:start}
+.go{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;background:var(--gold);color:var(--surface);font-weight:600;padding:11px 14px;border-radius:10px;font-size:15px}
+:root[data-theme="dark"] .go{color:#101634}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .go{color:#101634}}
+.go:hover{filter:brightness(1.07)}
+
+/* Guides */
+.guides{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.guide{border-top:3px solid var(--gold);padding-top:14px;display:grid;gap:6px}
+.guide h3{font-size:19px}
+.guide p{margin:0;color:var(--muted);font-size:15px}
+.soon{font-size:12px;color:var(--gold);font-weight:600;text-transform:uppercase;letter-spacing:.1em}
+[dir="rtl"] .soon{letter-spacing:0;font-size:13px}
+
+/* Disclosure + footer */
+.note{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:grid;gap:6px}
+.note h3{font-size:17px}
+.note p{margin:0;color:var(--muted);font-size:15px;max-width:75ch}
+footer{border-top:1px solid var(--line);padding-block:28px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="top">
+      <a class="brand" href="#top" aria-label="DoniaNova">
+        <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 L19 13 L31 16 L19 19 L16 31 L13 19 L1 16 L13 13 Z" fill="#E6B95B"/></svg>
+        <b>Donia<span>Nova</span></b>
+      </a>
+      <div class="lang" role="group" aria-label="Language">
+        <button id="btn-ar" type="button" data-lang="ar">عربي</button>
+        <button id="btn-en" type="button" data-lang="en">EN</button>
+      </div>
+    </div>
+    <div class="hero" id="top">
+      <div class="eyebrow" data-i="eyebrow"></div>
+      <h1 data-i="title"></h1>
+      <p data-i="lead"></p>
+      <div class="pillars"><span data-i="p1"></span><span data-i="p2"></span><span data-i="p3"></span><span data-i="p4"></span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="picks">
+    <div class="wrap">
+      <div class="head">
+        <div><h2 data-i="picksT"></h2><p data-i="picksD"></p></div>
+        <div class="filters" id="filters" role="group"></div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="guides" style="padding-top:8px">
+    <div class="wrap">
+      <div class="head"><div><h2 data-i="guidesT"></h2><p data-i="guidesD"></p></div></div>
+      <div class="guides" id="guideList"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:8px">
+    <div class="wrap">
+      <div class="note">
+        <h3 data-i="discT"></h3>
+        <p data-i="discD"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 DoniaNova · <span data-i="by"></span></span>
+    <span data-i="tag"></span>
+  </div>
+</footer>
+
+<script>
+// ===== Edit here: replace each "link" with your AliExpress affiliate link =====
+const PRODUCTS = [
+  {cat:"rfid", ic:"card", img:"img/rfid-card.jpg", link:"https://s.click.aliexpress.com/e/_c3HDn9Sn",
+   en:["RFID & NFC blocking card","A card-sized shield you slip next to your contactless bank cards or passport. It targets the 13.56 MHz signal that tap-to-pay cards use, so the cards beside it are harder to read without your knowledge. Keep it in the same pocket or slot as the cards it protects.","Wallets, passports, travel"],
+   ar:["بطاقة حجب RFID وNFC","بطاقة بحجم البطاقة البنكية تضعها بجانب بطاقاتك اللاتلامسية أو جواز سفرك. تستهدف تردد 13.56 ميغاهرتز الذي تستعمله بطاقات الدفع باللمس، فيصعب قراءة البطاقات المجاورة لها دون علمك. ضعها في نفس الجيب أو الخانة مع البطاقات التي تحميها.","المحافظ وجوازات السفر والسفر"]},
+  {cat:"rfid", ic:"wallet", link:"https://www.aliexpress.com/w/wholesale-rfid-slim-wallet.html",
+   en:["RFID-blocking slim wallet","A thin card holder with built-in shielding, so you carry less and stay protected.","Minimalists, frequent flyers"],
+   ar:["محفظة رفيعة بحماية RFID","حامل بطاقات نحيف بطبقة حماية مدمجة، أخف في الجيب وأكثر أماناً.","محبّو البساطة وكثيرو السفر"]},
+  {cat:"rfid", ic:"tag", link:"https://www.aliexpress.com/w/wholesale-ntag215-nfc-sticker.html",
+   en:["NFC sticker tags (NTAG215)","Program them with a phone to open a link, share Wi-Fi, or run a shortcut with one tap.","Classrooms, smart homes"],
+   ar:["ملصقات NFC من نوع NTAG215","تبرمجها بالهاتف لتفتح رابطاً أو تشارك شبكة الواي فاي أو تشغّل اختصاراً بلمسة واحدة.","الأقسام الدراسية والمنازل الذكية"]},
+  {cat:"rfid", ic:"reader", link:"https://www.aliexpress.com/w/wholesale-usb-rfid-reader.html",
+   en:["USB RFID card reader","Plug-and-play reader for attendance, library loans or access-card projects.","Schools, small offices"],
+   ar:["قارئ بطاقات RFID عبر USB","قارئ جاهز للتوصيل لتسجيل الحضور أو إعارة الكتب أو مشاريع بطاقات الدخول.","المدارس والمكاتب الصغيرة"]},
+  {cat:"audio", ic:"buds", img:"img/lenovo-thinkplus.jpg", link:"https://s.click.aliexpress.com/e/_c3vh01Of",
+   en:["Lenovo thinkplus TWS earbuds","Bluetooth 5.3 wireless earbuds with touch controls, deep bass and noise reduction, from a known brand.","Daily listening, calls"],
+   ar:["سماعات Lenovo thinkplus اللاسلكية","سماعات بلوتوث 5.3 بتحكم باللمس وصوت باص عميق وتقليل للضوضاء، من علامة معروفة.","الاستماع اليومي والمكالمات"]},
+  {cat:"audio", ic:"buds", link:"https://www.aliexpress.com/w/wholesale-enc-bluetooth-earbuds.html",
+   en:["Earbuds with ENC microphone","Environmental noise cancelling keeps your voice clear on calls and online classes.","Online teaching, calls"],
+   ar:["سماعات لاسلكية بميكروفون ENC","تقنية عزل الضوضاء تجعل صوتك واضحاً في المكالمات والحصص عن بعد.","التدريس عن بعد والمكالمات"]},
+  {cat:"audio", ic:"open", link:"https://www.aliexpress.com/w/wholesale-open-ear-headphones.html",
+   en:["Open-ear headphones","Leave your ears free to hear traffic and announcements while you listen.","Walking tours, commuting"],
+   ar:["سماعات بأذن مفتوحة","تُبقي أذنيك حرّتين لسماع ما حولك من إعلانات وحركة أثناء الاستماع.","الجولات السياحية والتنقّل"]},
+  {cat:"audio", ic:"mic", link:"https://www.aliexpress.com/w/wholesale-wireless-lavalier-microphone.html",
+   en:["Wireless lavalier microphone","Clip-on mic for recording lessons, reels and interviews with clean sound.","Teachers, content creators"],
+   ar:["ميكروفون لاسلكي يُثبَّت على الملابس","لتسجيل الدروس والمقاطع والمقابلات بصوت نقي.","الأساتذة وصنّاع المحتوى"]},
+  {cat:"class", ic:"hub", img:"img/usb-hub.jpg", link:"https://s.click.aliexpress.com/e/_c2u2lhJv",
+   en:["8-in-2 USB hub with card reader","One aluminium hub for laptops and tablets: plugs in by USB-C or USB-A, adds 4 USB ports, SD and microSD slots, a USB-C port and a 3.5 mm audio jack. It has no HDMI, so it cannot connect a projector.","Teachers' laptops, tablets"],
+   ar:["موزّع USB 8 في 2 مع قارئ بطاقات","موزّع ألمنيوم واحد للحاسوب واللوحي: يتصل بمنفذ USB-C أو USB-A، ويضيف 4 منافذ USB وفتحتي بطاقة SD وmicroSD ومنفذ USB-C ومخرج صوت 3.5 مم. لا يحتوي على HDMI، فلا يصلح لتوصيل جهاز العرض.","حواسيب الأساتذة والأجهزة اللوحية"]},
+  {cat:"class", ic:"stand", img:"img/laptop-stand.jpg", link:"https://s.click.aliexpress.com/e/_c3ucywDp",
+   en:["Foldable laptop stand, 10 heights","Raises the screen from 10.5 to 20 cm in 10 steps so you look ahead instead of down, and lets air flow under the laptop. Folds flat into a bag. It is ABS plastic, not aluminium: fine for everyday laptops, less suited to heavy gaming models.","Teachers, remote work, students"],
+   ar:["حامل حاسوب محمول قابل للطي بـ10 ارتفاعات","يرفع الشاشة من 10.5 إلى 20 سم على 10 مستويات، فتنظر أمامك بدل الانحناء، ويسمح بمرور الهواء تحت الحاسوب. ينطوي ويدخل في الحقيبة. مصنوع من بلاستيك ABS لا من الألمنيوم: مناسب للحواسيب العادية، وأقل ملاءمة لحواسيب الألعاب الثقيلة.","الأساتذة والعمل عن بعد والطلبة"]},
+  {cat:"class", ic:"pointer", link:"https://www.aliexpress.com/w/wholesale-wireless-presenter.html",
+   en:["Wireless presenter","Change slides from anywhere in the room and point with a built-in laser.","Lessons, conferences"],
+   ar:["جهاز تحكم لاسلكي بالعروض","تقلّب الشرائح من أي مكان في القاعة مع مؤشّر ليزر مدمج.","الدروس والمحاضرات"]},
+  {cat:"class", ic:"pad", img:"img/lcd-tablet.jpg", link:"https://s.click.aliexpress.com/e/_c3zVxrbD",
+   en:["Colour LCD writing tablet, 13 or 16 inch","A paperless board for writing, counting and drawing that clears with one button. A lock switch stops accidental erasing, and the pen clips into the frame. It cannot save drawings, and the erase button wipes the whole screen at once.","Children 3–12, tutoring, drills"],
+   ar:["لوح كتابة LCD ملوّن مقاس 13 أو 16 بوصة","سبورة بلا ورق للكتابة والحساب والرسم، تُمسح بزرّ واحد. فيها مفتاح قفل يمنع المسح بالخطأ، والقلم يُثبَّت في جانب اللوح. لا تحفظ الرسومات، وزرّ المسح يمحو الشاشة كلها دفعة واحدة.","الأطفال من 3 إلى 12 سنة والدروس الخصوصية"]},
+  {cat:"class", ic:"projector", link:"https://www.aliexpress.com/w/wholesale-portable-mini-projector.html",
+   en:["Portable mini projector","Turns any wall into a screen for a lesson, a club activity or a movie night.","Classrooms, clubs"],
+   ar:["جهاز عرض صغير محمول","يحوّل أي جدار إلى شاشة لدرس أو نشاط نادٍ أو سهرة.","الأقسام والنوادي"]},
+  {cat:"home", ic:"scale", img:"img/smart-scale.jpg", link:"https://s.click.aliexpress.com/e/_c35XyKnl",
+   en:["Smart Bluetooth body scale","Syncs your weight to a phone app over Bluetooth, with 4 sensors, 50 g steps up to 180 kg, and USB charging instead of batteries. Body-fat figures are estimates; weight is the reliable number.","Families, fitness tracking"],
+   ar:["ميزان ذكي بالبلوتوث","يرسل وزنك إلى تطبيق على الهاتف عبر البلوتوث، بأربعة حساسات ودقة 50 غرام حتى 180 كغ، ويُشحن عبر USB بدل البطاريات. نسبة الدهون تقديرية، والوزن هو الرقم الدقيق.","العائلة ومتابعة اللياقة"]},
+  {cat:"travel", ic:"scope", img:"img/monocular.jpg", link:"https://s.click.aliexpress.com/e/_c4oWvPKB",
+   en:["Pocket monocular with phone clip","A 9 cm monocular that fits in a pocket, with a clip to hold it over your phone camera. Good for hikes, concerts and birdwatching. Ignore the \"2000x\" on the listing: expect the modest zoom of a small lens, not a telescope for stars.","Hiking, concerts, birdwatching"],
+   ar:["منظار أحادي للجيب مع مشبك للهاتف","منظار بطول 9 سم يدخل في الجيب، مع مشبك لتثبيته على كاميرا الهاتف. مناسب للمشي في الطبيعة والحفلات ومراقبة الطيور. لا تصدّق رقم \"2000x\" في الإعلان: توقّع تكبيراً متواضعاً لعدسة صغيرة، لا تلسكوباً لرؤية النجوم.","المشي في الطبيعة والحفلات ومراقبة الطيور"]},
+  {cat:"travel", ic:"car", link:"https://s.click.aliexpress.com/e/_c3zav1af",
+   en:["ELM327 OBD2 Bluetooth scanner","Plugs into your car's OBD2 port and reads engine fault codes on your phone before a road trip. Works best with Android; check iPhone support before buying.","Road trips, car owners"],
+   ar:["جهاز تشخيص السيارة ELM327 OBD2","يُوصل بمنفذ OBD2 في السيارة ويقرأ أعطال المحرك على هاتفك قبل السفر. يعمل أفضل مع أندرويد، وتأكّد من دعم آيفون قبل الشراء.","رحلات الطريق وأصحاب السيارات"]},
+  {cat:"travel", ic:"plug", link:"https://www.aliexpress.com/w/wholesale-universal-travel-adapter-usb-c.html",
+   en:["Universal travel adapter","One plug for most countries, with USB-C and USB-A ports to charge several devices.","International trips"],
+   ar:["محوّل سفر عالمي","قابس واحد لأغلب الدول، مع منافذ USB-C وUSB-A لشحن عدة أجهزة معاً.","الرحلات الدولية"]},
+  {cat:"travel", ic:"locate", link:"https://www.aliexpress.com/w/wholesale-bluetooth-tracker-tag.html",
+   en:["Bluetooth tracker tag","Drop it in a suitcase or bag and locate it from your phone.","Luggage, keys"],
+   ar:["شريحة تتبّع بلوتوث","تضعها في الحقيبة أو مع المفاتيح وتحدّد مكانها من هاتفك.","الأمتعة والمفاتيح"]},
+  {cat:"travel", ic:"battery", link:"https://www.aliexpress.com/w/wholesale-10000mah-power-bank-slim.html",
+   en:["Slim 10,000 mAh power bank","A pocket-size capacity that most airlines allow in carry-on luggage.","Day trips, flights"],
+   ar:["بطارية خارجية رفيعة 10,000 mAh","سعة بحجم الجيب تسمح بها أغلب شركات الطيران في حقيبة اليد.","الرحلات القصيرة والطيران"]}
+];
+
+const ICONS = {
+  card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/>',
+  wallet:'<path d="M4 7h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4z"/><path d="M4 7l11-3v3M16 13h2"/>',
+  tag:'<circle cx="12" cy="12" r="8"/><path d="M9 9.5a4 4 0 0 1 0 5M12 7.5a7 7 0 0 1 0 9"/>',
+  reader:'<rect x="6" y="3" width="12" height="14" rx="2"/><path d="M12 17v4M9 8h6"/>',
+  buds:'<path d="M7 5a3 3 0 0 1 3 3v3a3 3 0 0 1-3 3v5M17 5a3 3 0 0 0-3 3v3a3 3 0 0 0 3 3v5"/>',
+  open:'<path d="M4 14a8 8 0 0 1 16 0"/><rect x="3" y="13" width="4" height="6" rx="1.5"/><rect x="17" y="13" width="4" height="6" rx="1.5"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/>',
+  pointer:'<rect x="9" y="3" width="6" height="16" rx="3"/><path d="M12 7v2M12 22v-1"/>',
+  pad:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 9c2-2 4 2 6 0M8 14h8"/>',
+  projector:'<rect x="3" y="8" width="18" height="9" rx="2"/><circle cx="15" cy="12.5" r="2.5"/><path d="M7 20h10"/>',
+  plug:'<path d="M9 3v5M15 3v5M6 8h12v4a6 6 0 0 1-12 0zM12 18v3"/>',
+  locate:'<circle cx="12" cy="10" r="3"/><path d="M12 21s7-6.5 7-11a7 7 0 0 0-14 0c0 4.5 7 11 7 11z"/>',
+  car:'<path d="M5 16V11l2-5h10l2 5v5H5z"/><path d="M5 11h14"/><circle cx="8" cy="16" r="1.6"/><circle cx="16" cy="16" r="1.6"/>',
+  stand:'<path d="M4 19h16M7 19l4-9M17 19l-4-9M6 10l12-4"/>',
+  scope:'<rect x="3" y="8" width="13" height="8" rx="2"/><path d="M16 9.5h3a2 2 0 0 1 2 2v1a2 2 0 0 1-2 2h-3M7 8V6"/>',
+  hub:'<rect x="3" y="9" width="18" height="6" rx="1.5"/><path d="M7 12h2M11 12h2M15 12h2M12 9V5"/>',
+  scale:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 8h6M8 14h2M14 14h2"/>',
+  battery:'<rect x="4" y="6" width="14" height="12" rx="2"/><path d="M21 10v4M10 9l-2 3h4l-2 3"/>'
+};
+
+const CATS = {
+  all:{en:"All picks",ar:"كل المختارات"},
+  rfid:{en:"RFID & NFC",ar:"RFID وNFC"},
+  audio:{en:"Audio",ar:"السماعات والصوت"},
+  class:{en:"Classroom tech",ar:"تقنيات التدريس"},
+  travel:{en:"Travel tech",ar:"تقنيات السفر"},
+  home:{en:"Smart home",ar:"المنزل الذكي"}
+};
+
+const GUIDES = [
+  {en:["Best RFID blocking cards and wallets","What actually protects your cards, and what is marketing."],
+   ar:["أفضل بطاقات ومحافظ حماية RFID","ما الذي يحمي بطاقاتك فعلاً، وما الذي مجرّد تسويق."]},
+  {en:["The online teacher's starter kit","Microphone, earbuds and a presenter for clear, confident lessons."],
+   ar:["حقيبة الأستاذ للتدريس عن بعد","ميكروفون وسماعات وجهاز تحكم لدروس واضحة وواثقة."]},
+  {en:["Carry-on tech checklist","Adapters, power and trackers that fit in one small pouch."],
+   ar:["قائمة تقنيات حقيبة اليد","محوّلات وبطاريات وأجهزة تتبّع في حقيبة صغيرة واحدة."]}
+];
+
+const T = {
+  en:{eyebrow:"Smart gear, curated",title:"Smart gear for work, class and travel",
+      lead:"DoniaNova picks useful, affordable tech and explains who each item is for, so you can buy once and buy right.",
+      p1:"RFID & NFC",p2:"Headphones & mics",p3:"Classroom tech",p4:"Travel essentials",
+      picksT:"This week's picks",picksD:"Hand-picked items. Each card tells you what it does and who it suits.",
+      go:"View on AliExpress",bestFor:"Best for",
+      guidesT:"Buying guides",guidesD:"Short, honest guides to help you choose.",soon:"Coming soon",
+      discT:"How DoniaNova earns money",
+      discD:"Some links on this site are affiliate links. If you buy through them, we may earn a small commission from AliExpress at no extra cost to you. It never changes which products we recommend.",
+      by:"A DONIA LABS TECH project",tag:"Find the right gear, every time."},
+  ar:{eyebrow:"عُدّة ذكية مختارة بعناية",title:"عُدّتك الذكية للعمل والتدريس والسفر",
+      lead:"تختار لك دنيا نوفا أجهزة تقنية مفيدة وبأسعار معقولة، وتشرح لمن يناسب كل منتج، لتشتري مرة واحدة وتشتري الصحيح.",
+      p1:"RFID وNFC",p2:"سماعات وميكروفونات",p3:"تقنيات التدريس",p4:"أساسيات السفر",
+      picksT:"مختارات هذا الأسبوع",picksD:"منتجات منتقاة يدوياً، وكل بطاقة توضّح وظيفة المنتج ولمن يناسب.",
+      go:"عرض على علي إكسبريس",bestFor:"الأنسب لـ",
+      guidesT:"أدلة الشراء",guidesD:"أدلة قصيرة وصادقة تساعدك على الاختيار.",soon:"قريباً",
+      discT:"كيف تربح دنيا نوفا",
+      discD:"بعض الروابط في هذا الموقع روابط تسويق بالعمولة. إذا اشتريت من خلالها قد نحصل على عمولة صغيرة من علي إكسبريس دون أي تكلفة إضافية عليك، ولا يغيّر ذلك أبداً المنتجات التي نوصي بها.",
+      by:"مشروع من DONIA LABS TECH",tag:"بوصلتك لاختيار التقنية الصحيحة."}
+};
+
+let lang = "ar", cat = "all";
+try { lang = localStorage.getItem("dn-lang") || "ar"; } catch(e){}
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function render(){
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i]").forEach(el => el.textContent = t[el.dataset.i]);
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+
+  const f = document.getElementById("filters");
+  f.setAttribute("aria-label", lang === "ar" ? "تصفية حسب الفئة" : "Filter by category");
+  f.innerHTML = Object.keys(CATS).map(k =>
+    `<button type="button" id="f-${k}" data-cat="${k}" aria-pressed="${k===cat}">${esc(CATS[k][lang])}</button>`).join("");
+
+  const list = PRODUCTS.filter(p => cat === "all" || p.cat === cat);
+  document.getElementById("grid").innerHTML = list.map(p => {
+    const [name, why, best] = p[lang];
+    return `<article class="card">
+      ${p.img ? `<img class="shot" src="${p.img}" alt="${esc(name)}" loading="lazy">` : ""}
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[p.ic]}</svg></div>
+        <span class="tag">${esc(CATS[p.cat][lang])}</span>
+      </div>
+      <h3>${esc(name)}</h3>
+      <p>${esc(why)}</p>
+      <div style="display:grid;gap:12px">
+        <span class="best">${esc(t.bestFor)}: ${esc(best)}</span>
+        <a class="go" href="${p.link}" target="_blank" rel="sponsored noopener">${esc(t.go)}</a>
+      </div>
+    </article>`;
+  }).join("");
+
+  document.getElementById("guideList").innerHTML = GUIDES.map(g =>
+    `<article class="guide"><span class="soon">${esc(t.soon)}</span><h3>${esc(g[lang][0])}</h3><p>${esc(g[lang][1])}</p></article>`).join("");
+}
+
+document.querySelector(".lang").addEventListener("click", e => {
+  const b = e.target.closest("button[data-lang]"); if(!b) return;
+  lang = b.dataset.lang; try{localStorage.setItem("dn-lang", lang);}catch(e){}
+  render();
+});
+document.getElementById("filters").addEventListener("click", e => {
+  const b = e.target.closest("button[data-cat]"); if(!b) return;
+  cat = b.dataset.cat; render();
+});
+render();
+
+// Quiet starfield behind the masthead
+(function(){
+  const c = document.getElementById("sky"), x = c.getContext("2d");
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let stars = [], w, h;
+  function size(){
+    const r = c.getBoundingClientRect(), d = devicePixelRatio || 1;
+    w = r.width; h = r.height; c.width = w*d; c.height = h*d; x.setTransform(d,0,0,d,0,0);
+    stars = Array.from({length: Math.round(w*h/5000)}, () => ({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.2+.2, p:Math.random()*6.28}));
+  }
+  function draw(t){
+    x.clearRect(0,0,w,h);
+    const nx = document.documentElement.dir === "rtl" ? w*0.16 : w*0.84, ny = h*0.42;
+    const g = x.createRadialGradient(nx,ny,0,nx,ny,Math.min(w,h)*0.55);
+    g.addColorStop(0,"rgba(230,185,91,.35)"); g.addColorStop(.35,"rgba(230,185,91,.08)"); g.addColorStop(1,"rgba(230,185,91,0)");
+    x.fillStyle = g; x.fillRect(0,0,w,h);
+    for(const s of stars){
+      const a = .35 + .45*Math.sin(s.p + (t||0)/1400);
+      x.fillStyle = `rgba(238,240,248,${a})`; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.28); x.fill();
+    }
+    if(!still) requestAnimationFrame(draw);
+  }
+  size(); addEventListener("resize", size); draw(0);
+})();
+</script>
+</body>
+</html>
