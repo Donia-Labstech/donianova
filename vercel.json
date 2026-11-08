@@ -1,15 +1,15 @@
 {
-  "cleanUrls": false,
-  "trailingSlash": true,
-  "headers": [
+ "cleanUrls": false,
+ "trailingSlash": true,
+ "headers": [
+  {
+   "source": "/img/(.*)",
+   "headers": [
     {
-      "source": "/img/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=604800"
-        }
-      ]
+     "key": "Cache-Control",
+     "value": "public, max-age=604800"
     }
-  ]
+   ]
+  }
+ ]
 }
