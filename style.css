@@ -179,6 +179,6 @@ footer a{color:#E6B95B}
 .skel{background:linear-gradient(90deg,var(--chip),var(--surface),var(--chip));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:var(--r);min-height:330px}
 @keyframes sk{to{background-position:-200% 0}}
 .status{color:var(--muted);font-size:14px;margin-bottom:14px}
-.deal .shot{background:#fff;height:auto;aspect-ratio:1;object-fit:contain}
+.card .shot{height:auto;aspect-ratio:1;object-fit:contain;background:#fff}
 @media (max-width:520px){.dealbtn{padding:6px 10px;font-size:13px}}
 @media (prefers-reduced-motion: reduce){.mast::before,.brand svg,.hero h1 .glow{animation:none}.js .reveal{opacity:1;transform:none}}
