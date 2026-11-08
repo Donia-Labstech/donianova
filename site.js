@@ -2,6 +2,12 @@
 (function(){
   var f=document.getElementById('filters');
   document.documentElement.classList.add('js');
+  (function(){var u=location.href.split('#')[0],en=encodeURIComponent(u);
+    document.querySelectorAll('.sb[data-net]').forEach(function(a){var n=a.dataset.net;
+      a.href=n==='wa'?'https://wa.me/?text='+encodeURIComponent(document.title+' '+u):n==='fb'?'https://www.facebook.com/sharer/sharer.php?u='+en:'https://t.me/share/url?url='+en+'&text='+encodeURIComponent(document.title);});
+    var c=document.querySelector('.sb-copy');if(c)c.addEventListener('click',function(){var sp=c.querySelector('span'),o=sp.textContent;
+      var done=function(){sp.textContent=c.dataset.copied;setTimeout(function(){sp.textContent=o},1800)};
+      if(navigator.clipboard)navigator.clipboard.writeText(u).then(done,function(){prompt('',u)});else prompt('',u);});})();
   var still0=matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(f){f.addEventListener('click',function(ev){var b=ev.target.closest('button[data-cat]');if(!b)return;var c=b.dataset.cat;
     f.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',x===b)});
