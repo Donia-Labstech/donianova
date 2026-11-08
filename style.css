@@ -98,3 +98,71 @@ footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
 .lang a{color:var(--night-ink);padding:6px 14px;border-radius:999px;font-size:14px;text-decoration:none}
 .lang a[aria-current="true"]{background:#E6B95B;color:#101634;font-weight:600}
 .sub{padding-block:16px 8px}
+
+/* ---- v2: fixes + motion ---- */
+[hidden]{display:none!important}
+@view-transition{navigation:auto}
+html{scroll-behavior:smooth}
+::selection{background:#E6B95B;color:#101634}
+
+/* masthead: drifting aurora under the stars */
+.mast::before{content:"";position:absolute;inset:-40%;pointer-events:none;
+  background:radial-gradient(40% 35% at 20% 30%,rgba(110,90,255,.22),transparent 70%),
+             radial-gradient(35% 30% at 80% 60%,rgba(230,185,91,.16),transparent 70%),
+             radial-gradient(30% 30% at 50% 90%,rgba(40,160,220,.14),transparent 70%);
+  animation:aurora 22s ease-in-out infinite alternate}
+@keyframes aurora{0%{transform:translate3d(-4%,-2%,0) rotate(0deg)}100%{transform:translate3d(4%,3%,0) rotate(8deg)}}
+.mast .wrap{position:relative;z-index:1}
+.brand svg{animation:twinkle 4s ease-in-out infinite;transform-origin:center}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.12) rotate(45deg);filter:drop-shadow(0 0 8px rgba(230,185,91,.8))}}
+
+/* hero entrance */
+.hero>*{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+.hero>*:nth-child(2){animation-delay:.08s}.hero>*:nth-child(3){animation-delay:.16s}
+.hero>*:nth-child(4){animation-delay:.24s}.hero>*:nth-child(5){animation-delay:.32s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero h1 .glow{background:linear-gradient(90deg,#F6E3B4,#E6B95B 40%,#FFF4D6 60%,#E6B95B);background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 6s linear infinite}
+@keyframes sheen{to{background-position:-200% 0}}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:600;text-decoration:none;font-size:15px;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-gold{background:linear-gradient(135deg,#F2CF7E,#E6B95B 50%,#C9952E);color:#101634;box-shadow:0 8px 28px -8px rgba(230,185,91,.7)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 34px -8px rgba(230,185,91,.9)}
+.btn-ghost{border:1px solid rgba(238,240,248,.3);color:#EEF0F8}
+.btn-ghost:hover{background:rgba(238,240,248,.08);transform:translateY(-2px)}
+
+/* trust strip */
+.trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:-28px;position:relative;z-index:2}
+.trust div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px -18px rgba(16,22,52,.35)}
+.trust b{display:block;font-size:15px}.trust span{font-size:13px;color:var(--muted)}
+.trust i{font-style:normal;width:36px;height:36px;flex:none;border-radius:10px;display:grid;place-items:center;background:var(--gold-soft);color:var(--gold);font-size:18px}
+
+/* cards: lift, spotlight, image zoom */
+.card{position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s,border-color .35s}
+.card::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(320px circle at var(--mx,50%) var(--my,0%),rgba(230,185,91,.16),transparent 60%)}
+.card:hover{transform:translateY(-6px);box-shadow:0 22px 44px -22px rgba(16,22,52,.45),0 0 0 1px rgba(230,185,91,.35);border-color:transparent}
+.card:hover::before{opacity:1}
+.card a:has(.shot){display:block;overflow:hidden;border-radius:10px}
+.card .shot{transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.card:hover .shot{transform:scale(1.06)}
+.card.enter{animation:pop .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.go{position:relative;overflow:hidden;background:linear-gradient(135deg,#D9A647,var(--gold));transition:transform .25s,box-shadow .25s}
+.go::after{content:"";position:absolute;inset:0;transform:translateX(-120%);background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%)}
+.go:hover{transform:translateY(-1px);box-shadow:0 10px 24px -10px rgba(168,116,28,.8)}
+.go:hover::after{transform:translateX(120%);transition:transform .8s}
+.filters button{transition:background .25s,color .25s,transform .2s,border-color .25s}
+.filters button:hover{transform:translateY(-1px);border-color:var(--gold)}
+.count{font-size:14px;color:var(--muted);margin-top:-8px;margin-bottom:14px}
+
+/* reveal on scroll (only when JS is running) */
+.js .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+.guide{transition:transform .3s}.guide:hover{transform:translateY(-4px)}
+
+/* footer */
+footer{background:var(--night);color:#AEB4CF;border-top:0}
+footer a{color:#E6B95B}
+
+@media (prefers-reduced-motion: reduce){.mast::before,.brand svg,.hero h1 .glow{animation:none}.js .reveal{opacity:1;transform:none}}
