@@ -165,4 +165,20 @@ html{scroll-behavior:smooth}
 footer{background:var(--night);color:#AEB4CF;border-top:0}
 footer a{color:#E6B95B}
 
+.dealbtn{color:#101634;background:#E6B95B;padding:7px 14px;border-radius:999px;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap}
+.dealbtn:hover{filter:brightness(1.08)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tabs button{border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:9px 16px;border-radius:999px;font-size:14px;transition:background .25s,color .25s}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.deal h3{font-size:15px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.9em}
+.priceRow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.priceRow b{font-size:20px;font-variant-numeric:tabular-nums}
+.priceRow s{color:var(--muted);font-size:13px}
+.off{background:#E54B4B;color:#fff;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px}
+.meta{font-size:12.5px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.skel{background:linear-gradient(90deg,var(--chip),var(--surface),var(--chip));background-size:200% 100%;animation:sk 1.2s linear infinite;border-radius:var(--r);min-height:330px}
+@keyframes sk{to{background-position:-200% 0}}
+.status{color:var(--muted);font-size:14px;margin-bottom:14px}
+.deal .shot{background:#fff;height:auto;aspect-ratio:1;object-fit:contain}
+@media (max-width:520px){.dealbtn{padding:6px 10px;font-size:13px}}
 @media (prefers-reduced-motion: reduce){.mast::before,.brand svg,.hero h1 .glow{animation:none}.js .reveal{opacity:1;transform:none}}
