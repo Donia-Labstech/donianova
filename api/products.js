@@ -72,7 +72,7 @@ const RULES = {
   translator:{ min: 15, drop: /case|bag|protector|حقيبة|غطاء|واقي/i },
   transbuds:{ min: 8 },
   scanpen:  { min: 15, drop: /refill|case|غطاء/i },
-  microsd:  { min: 2, drop: /reader|قارئ/i },
+  microsd:  { min: 5, drop: /reader|قارئ|\b(64|128|256|512) ?MB\b/i, keep: /sandisk|samsung|kingston|lexar|netac|kioxia|pny|team ?group|transcend|sandisk|سانديسك|سامسونج|كينغستون|ليكسار|نيتاك/i },
   cardreader:{ min: 2 },
   projscreen:{ min: 8 },
   hdmiwifi: { min: 8 },
@@ -95,6 +95,9 @@ module.exports = async (req, res) => {
     const items = (await ali.search(NICHES[niche], { lang, size: 50, trace }))
       .filter(p => !(rule.min && Number(p.price) < rule.min))
       .filter(p => !(rule.drop && rule.drop.test(p.title)))
+      .filter(p => !(rule.keep && !rule.keep.test(p.title)))
+      // quality guard: hide poorly rated listings (keeps new items that have no rating yet)
+      .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
       .slice(0, 16);
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).json({ niche, lang, updated: new Date().toISOString(), items, mode: ali.mode(), trace: trace || undefined });
