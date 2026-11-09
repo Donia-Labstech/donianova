@@ -25,7 +25,27 @@ const NICHES = {
   presenter: 'wireless presenter laser pointer',
   webcam:    'webcam 1080p microphone',
   mic:       'wireless lavalier microphone',
+  // recording & camera
+  recorder:  'digital voice recorder',
+  ringlight: 'ring light tripod phone',
+  gimbal:    'phone gimbal stabilizer',
+  actioncam: 'action camera 4K',
+  // translation
+  translator:'AI voice translator device',
+  transbuds: 'translation earbuds AI translator',
+  scanpen:   'translation scanning pen',
+  // memory
+  microsd:   'micro SD card 128GB',
+  cardreader:'USB C SD card reader',
+  // display (data show)
   projector: 'mini projector portable',
+  projscreen:'portable projector screen',
+  hdmiwifi:  'wireless HDMI display dongle',
+  monitor:   'portable monitor 15.6 inch',
+  doccam:    'document camera visualizer',
+  // business printing
+  labelprn:  'thermal label printer',
+  receiptprn:'bluetooth thermal receipt printer',
   // travel
   travel:    'universal travel adapter',
   luggage:   'digital luggage scale',
@@ -44,7 +64,22 @@ const RULES = {
   webcam:   { min: 6, drop: /cover|غطاء/i },
   keyboard: { min: 6 },
   powerbank:{ min: 6, drop: ACCESSORY },
-  board:    { min: 3 }
+  board:    { min: 3 },
+  recorder: { min: 8, drop: /case|bag|حقيبة|غطاء/i },
+  ringlight:{ min: 4 },
+  gimbal:   { min: 12 },
+  actioncam:{ min: 25, drop: /mount|case|strap|battery|حامل|بطارية|حزام/i },
+  translator:{ min: 15, drop: /case|bag|protector|حقيبة|غطاء|واقي/i },
+  transbuds:{ min: 8 },
+  scanpen:  { min: 15, drop: /refill|case|غطاء/i },
+  microsd:  { min: 2, drop: /reader|قارئ/i },
+  cardreader:{ min: 2 },
+  projscreen:{ min: 8 },
+  hdmiwifi: { min: 8 },
+  monitor:  { min: 40, drop: /stand|case|bag|حامل|حقيبة|غطاء/i },
+  doccam:   { min: 20 },
+  labelprn: { min: 18, drop: /paper|sticker|label roll|ribbon|ورق|ملصق|شريط/i },
+  receiptprn:{ min: 18, drop: /paper|roll|ورق|لفة/i }
 };
 
 module.exports = async (req, res) => {
