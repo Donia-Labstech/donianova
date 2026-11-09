@@ -35,16 +35,25 @@
 
 (function(){
   var ar=(document.documentElement.lang||'ar')==='ar';
-  var T=ar?{fab:'اسأل نوفا',title:'نوفا، مساعدك الذكي',sub:'يقترح لك الجهاز المناسب من مختاراتنا',hi:'أهلاً 👋 أنا نوفا. أخبرني ماذا تحتاج (للتدريس، للسفر، للاستماع...) وميزانيتك تقريباً، وأقترح لك الأنسب.',ph:'اكتب سؤالك…',send:'إرسال',chips:['سماعة جيدة للحصص عن بعد','ماذا أحتاج للسفر؟','هل بطاقة RFID مفيدة فعلاً؟'],err:'تعذّر الرد الآن. جرّب بعد قليل.',rate:'وصلت إلى الحد المؤقت للأسئلة، جرّب بعد دقائق.',fine:'قد يخطئ المساعد. السعر النهائي على علي إكسبريس.'}
-          :{fab:'Ask Nova',title:'Nova, your smart assistant',sub:'Finds the right gear from our picks',hi:'Hi 👋 I am Nova. Tell me what you need (teaching, travel, listening...) and a rough budget, and I will suggest the best fit.',ph:'Type your question…',send:'Send',chips:['Good earbuds for online classes','What do I need for travel?','Is an RFID card really useful?'],err:'No reply right now. Please try again shortly.',rate:'Question limit reached for now. Try again in a few minutes.',fine:'The assistant can make mistakes. Final price is on AliExpress.'};
+  var T=ar?{fab:'اسأل نوفا',title:'نوفا، مساعدك الذكي',sub:'يبحث، يقارن ويقترح لك الأنسب',hi:'أهلاً 👋 أنا نوفا. أبحث لك في علي إكسبريس وأقارن بين المنتجات بأسعارها الحالية: قارئ باركود، أقراص صلبة، لواحق الهاتف، أدوات التعليم والسفر… أخبرني ماذا تحتاج وميزانيتك.',ph:'اكتب سؤالك…',send:'إرسال',chips:['قارن لي بين أفضل أقراص SSD المحمولة','قارئ باركود لاسلكي لمحل صغير','سماعة جيدة للحصص عن بعد','شاحن سريع وبطارية للسفر'],err:'تعذّر الرد الآن. جرّب بعد قليل.',rate:'وصلت إلى الحد المؤقت للأسئلة، جرّب بعد دقائق.',fine:'قد يخطئ المساعد. السعر النهائي على علي إكسبريس.'}
+          :{fab:'Ask Nova',title:'Nova, your smart assistant',sub:'Searches, compares and suggests',hi:'Hi 👋 I am Nova. I search AliExpress and compare products at their current prices: barcode scanners, drives, phone accessories, teaching and travel gear… Tell me what you need and your budget.',ph:'Type your question…',send:'Send',chips:['Compare the best portable SSDs','Wireless barcode scanner for a small shop','Good earbuds for online classes','Fast charger and power bank for travel'],err:'No reply right now. Please try again shortly.',rate:'Question limit reached for now. Try again in a few minutes.',fine:'The assistant can make mistakes. Final price is on AliExpress.'};
   var hist=[];try{hist=JSON.parse(sessionStorage.getItem('nova')||'[]')}catch(e){}
   var star='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 L19 13 L31 16 L19 19 L16 31 L13 19 L1 16 L13 13 Z" fill="#E6B95B"/></svg>';
   var fab=document.createElement('button');fab.className='nova-fab';fab.type='button';fab.innerHTML=star+'<span>'+T.fab+'</span>';fab.setAttribute('aria-expanded','false');
   document.body.appendChild(fab);
   var box=null,log,inp,busy=false;
   function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-  function fmt(s){s=esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-    return s.replace(/(https?:\/\/[^\s)]+|\/(?:ar|en)\/(?:p\/[a-z0-9-]+\/|deals\/))/g,function(u){var ext=u.indexOf('http')===0;return '<a href="'+u+'"'+(ext?' target="_blank" rel="sponsored nofollow noopener"':'')+'>'+(ext?u:(ar?'افتح الصفحة':'Open page'))+'</a>'});}
+  function inl(s){s=esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+    return s.replace(/(https?:\/\/[^\s)<]+|\/(?:ar|en)\/(?:p\/[a-z0-9-]+\/|deals\/))/g,function(u){var ext=u.indexOf('http')===0;return '<a href="'+u+'"'+(ext?' target="_blank" rel="sponsored nofollow noopener"':'')+'>'+(ext?(ar?'عرض المنتج ↗':'View product ↗'):(ar?'افتح الصفحة':'Open page'))+'</a>'});}
+  function fmt(s){var L=s.split('\n'),o='',i=0;
+    while(i<L.length){var l=L[i].trim();
+      if(/^\|.*\|$/.test(l)){var rows=[];while(i<L.length&&/^\|.*\|$/.test(L[i].trim())){rows.push(L[i].trim());i++;}
+        rows=rows.filter(function(r){return !/^\|[\s:\-|]+\|$/.test(r)});
+        o+='<div class="tbl"><table>'+rows.map(function(r,ri){var c=r.slice(1,-1).split('|');return '<tr>'+c.map(function(x){return ri?'<td>'+inl(x.trim())+'</td>':'<th>'+inl(x.trim())+'</th>'}).join('')+'</tr>'}).join('')+'</table></div>';continue;}
+      if(/^[-•*]\s+/.test(l)){o+='<ul>';while(i<L.length&&/^[-•*]\s+/.test(L[i].trim())){o+='<li>'+inl(L[i].trim().replace(/^[-•*]\s+/,''))+'</li>';i++;}o+='</ul>';continue;}
+      if(/^#{1,4}\s/.test(l)){o+='<p><b>'+inl(l.replace(/^#+\s/,''))+'</b></p>';i++;continue;}
+      if(l)o+='<p>'+inl(l)+'</p>';i++;}
+    return o;}
   function add(role,text,cls){var d=document.createElement('div');d.className='m '+(role==='user'?'u':'a')+(cls?' '+cls:'');d.innerHTML=role==='user'?esc(text):fmt(text);log.appendChild(d);log.scrollTop=log.scrollHeight;return d;}
   function save(){try{sessionStorage.setItem('nova',JSON.stringify(hist.slice(-12)))}catch(e){}}
   function send(q){q=(q||'').trim();if(!q||busy)return;busy=true;inp.value='';add('user',q);hist.push({role:'user',content:q});save();

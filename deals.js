@@ -30,6 +30,8 @@
       if(j.error)throw j; cache[n]=j; render(j);
     }).catch(function(){grid.innerHTML='';st.innerHTML=esc(C.fail)+' <a href="'+C.home+'">DoniaNova</a>';});
   }
-  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(b)load(b.dataset.n);});
-  load(tabs.querySelector('button').dataset.n);
+  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;load(b.dataset.n);try{history.replaceState(null,'','#'+b.dataset.n)}catch(e){}
+    if(innerWidth<760)st.scrollIntoView({behavior:'smooth',block:'start'});});
+  var h=(location.hash||'').slice(1);
+  load(tabs.querySelector('button[data-n="'+h+'"]')?h:tabs.querySelector('button').dataset.n);
 })();
