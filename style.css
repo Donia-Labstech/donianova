@@ -321,3 +321,57 @@ html[dir="ltr"] .cc:hover .cc-cta em{transform:translateX(5px)}
 .go.buy:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px #C98A1E,0 0 20px -6px #F2C266}
 @media (prefers-reduced-motion:reduce){.cc,.cc-orb,.cd::after,.cd-fire,.bd-hot,.cc::before{animation:none!important}}
 @media(max-width:640px){.ccards{grid-template-columns:1fr 1fr;gap:10px}.cc{padding:16px 13px 13px}.cc-orb{width:50px;height:50px}.cc-orb i{font-size:24px}.cc-hook{font-size:12.5px}.cc-badge{font-size:10px;padding:3px 8px}.cd-clock{margin-inline-start:0;width:100%;justify-content:center}}
+
+/* ---- v6: search + 3D cards ---- */
+@property --ang{syntax:'<angle>';initial-value:0deg;inherits:false}
+.tilt{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px));transform-style:preserve-3d;
+  transition:transform .6s cubic-bezier(.2,.7,.2,1),box-shadow .4s,border-color .4s;will-change:transform}
+.tilt.tilting{--ty:-8px;transition:transform .1s linear,box-shadow .4s,border-color .4s}
+.card.tilt{box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 0 var(--line),0 18px 34px -22px rgba(24,18,61,.45)}
+.card.tilt.tilting{box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 30px 60px -24px rgba(109,74,240,.55),0 0 34px -10px rgba(242,194,102,.55);border-color:transparent}
+.card.tilt:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px))}
+.cc.tilt:hover,.cc.tilt:focus-visible{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--ty,0px)) scale(1.02)}
+.glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;opacity:0;transition:opacity .35s;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,0%),rgba(255,255,255,.55),rgba(255,255,255,.12) 22%,transparent 50%);mix-blend-mode:soft-light}
+.tilting .glare{opacity:1}
+.rim{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:4;padding:2px;opacity:0;transition:opacity .4s;
+  background:conic-gradient(from var(--ang),#F2C266,#8B6CFF,#2FD6C8,#FF7FB0,#F2C266);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+  animation:rimspin 3.2s linear infinite;filter:drop-shadow(0 0 6px rgba(242,194,102,.7))}
+@keyframes rimspin{to{--ang:360deg}}
+.tilting .rim{opacity:1}
+.card.tilting .shot{transform:scale(1.06) translateZ(30px)}
+.card.tilting .bds{transform:translateZ(40px)}
+.card.tilting .go.buy{transform:translateZ(24px)}
+.cc.tilting .cc-orb{transform:translateZ(36px) scale(1.06)}
+.bds,.go.buy,.cc-orb{transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+/* header search */
+.msearch{display:flex;align-items:center;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:3px;backdrop-filter:blur(6px);transition:border-color .3s,box-shadow .3s}
+.msearch:focus-within{border-color:#F2C266;box-shadow:0 0 0 3px rgba(242,194,102,.25),0 0 24px -6px #F2C266}
+.msearch input{width:190px;background:transparent;border:0;outline:0;color:#fff;font:inherit;font-size:14px;padding:6px 12px}
+.msearch input::placeholder{color:rgba(255,255,255,.65)}
+.msearch button{width:34px;height:34px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;color:#1A1250;background:linear-gradient(135deg,#FFE3A0,#F2C266)}
+@media(max-width:480px){.dl-t{display:none}.mast .top>div{gap:6px!important}}
+@media(max-width:760px){.msearch input{display:none}.msearch{padding:2px;background:transparent;border-color:transparent}}
+/* hero + deals search */
+.hsearch,.dsearch{display:flex;align-items:center;gap:10px;max-width:640px;padding:7px 7px 7px 7px;padding-inline-start:16px;border-radius:999px;
+  background:rgba(255,255,255,.97);border:1px solid var(--line);box-shadow:0 20px 50px -24px rgba(109,74,240,.7),0 0 0 1px rgba(255,255,255,.4) inset;transition:box-shadow .3s}
+.hsearch{margin-top:22px}
+.hsearch:focus-within,.dsearch:focus-within{box-shadow:0 0 0 3px rgba(139,108,255,.35),0 24px 60px -20px rgba(109,74,240,.8),0 0 40px -10px rgba(242,194,102,.6)}
+.hsearch svg,.dsearch svg{color:#6D4AF0;flex:none}
+.hsearch input,.dsearch input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:16px;color:#18123D;padding:8px 0}
+.hsearch input::placeholder,.dsearch input::placeholder{color:#8A85A8}
+.hsearch button,.dsearch button{flex:none;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:15px;padding:11px 22px;border-radius:999px;color:#fff;
+  background:linear-gradient(135deg,#8B6CFF,#4B2FD0);box-shadow:0 10px 22px -10px #4B2FD0;transition:transform .2s,box-shadow .2s}
+.hsearch button:hover,.dsearch button:hover{transform:translateY(-1px);box-shadow:0 14px 28px -10px #4B2FD0,0 0 18px -4px #8B6CFF}
+.hpop{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;font-size:13.5px}
+.hpop span{color:rgba(255,255,255,.75)}
+.hpop a{color:#fff;text-decoration:none;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);transition:background .2s,border-color .2s}
+.hpop a:hover{background:rgba(242,194,102,.22);border-color:#F2C266}
+.dsearch{max-width:none;margin-bottom:10px}
+.sugg{display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:0;margin-bottom:14px;font-size:13.5px}
+.sugg:empty{display:none}
+.sugg span{color:var(--muted);font-weight:600}
+.sugg button{font:inherit;cursor:pointer;padding:6px 13px;border-radius:999px;border:1px solid var(--violet);background:var(--violet-soft);color:var(--ink)}
+.tone-blue{--t1:#6FB8FF;--t2:#2457D6}
+@media(max-width:640px){.hsearch,.dsearch{padding:5px;padding-inline-start:12px}.hsearch input,.dsearch input{font-size:15px}.hsearch button,.dsearch button{padding:10px 16px}}

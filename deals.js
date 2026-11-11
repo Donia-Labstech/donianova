@@ -44,6 +44,26 @@
         document.getElementById('cd-c').innerHTML=[[D,B.d],[H,B.h],[M,B.m],[S,B.s]].map(function(x){return '<span><b>'+pad(x[0])+'</b><i>'+x[1]+'</i></span>'}).join('');}
       else{cd.classList.add('live');document.getElementById('cd-t').textContent=B.liveT;document.getElementById('cd-s').textContent=B.liveS;document.getElementById('cd-c').innerHTML='';}}
     tick();setInterval(tick,1000);})();
+  var S=C.S||{}, qi=document.getElementById('q'), sugg=document.getElementById('sugg'), sform=document.getElementById('sform');
+  function norm(x){return String(x||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim()}
+  function suggest(v){if(!sugg)return;var n=norm(v);if(n.length<2){sugg.innerHTML='';return;}
+    var hits=Object.keys(C.names||{}).filter(function(k){return norm(C.names[k]).indexOf(n)>-1||norm((C.hooks||{})[k]).indexOf(n)>-1||k.indexOf(n)>-1}).slice(0,6);
+    sugg.innerHTML=hits.length?'<span>'+esc(S.cats)+'</span>'+hits.map(function(k){return '<button type="button" data-n="'+k+'">'+esc((C.icons||{})[k]||'✦')+' '+esc(C.names[k])+'</button>'}).join(''):'';}
+  function search(v){v=String(v||'').trim();if(v.length<2){st.textContent=S.short;return;}
+    var h=document.getElementById('cathero');h.className='cathero tone-blue';
+    document.getElementById('ch-i').textContent='🔍';document.getElementById('ch-n').textContent=S.res+' '+S.for+' «'+v+'»';document.getElementById('ch-h').textContent=S.hook;
+    h.classList.remove('pulse');void h.offsetWidth;h.classList.add('pulse');
+    tabs.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed','false')});
+    try{history.replaceState(null,'','?q='+encodeURIComponent(v))}catch(e){}
+    var key='q:'+v.toLowerCase();if(cache[key]){render(cache[key]);return;}
+    skel();
+    fetch('/api/products?q='+encodeURIComponent(v)+'&lang='+C.lang).then(function(r){return r.json()}).then(function(j){
+      if(j.error)throw j; cache[key]=j; if(!(j.items||[]).length){grid.innerHTML='';st.textContent=S.none;return;} render(j);
+    }).catch(function(){grid.innerHTML='';st.innerHTML=esc(C.fail);});
+    if(innerWidth<760)h.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(sform){sform.addEventListener('submit',function(ev){ev.preventDefault();qi.blur();search(qi.value);});
+    qi.addEventListener('input',function(){suggest(qi.value)});
+    sugg.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;sugg.innerHTML='';qi.value='';load(b.dataset.n);try{history.replaceState(null,'',location.pathname+'#'+b.dataset.n)}catch(e){}});}
   function load(n){
     hero(n);
     tabs.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.n===n)});
@@ -53,8 +73,11 @@
       if(j.error)throw j; cache[n]=j; render(j);
     }).catch(function(){grid.innerHTML='';st.innerHTML=esc(C.fail)+' <a href="'+C.home+'">DoniaNova</a>';});
   }
-  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;load(b.dataset.n);try{history.replaceState(null,'','#'+b.dataset.n)}catch(e){}
+  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;load(b.dataset.n);try{history.replaceState(null,'',location.pathname+'#'+b.dataset.n)}catch(e){}
     if(innerWidth<760)st.scrollIntoView({behavior:'smooth',block:'start'});});
-  var h=(location.hash||'').slice(1);
-  load(tabs.querySelector('button[data-n="'+h+'"]')?h:tabs.querySelector('button').dataset.n);
+  var h=(location.hash||'').slice(1), sp=null;try{sp=new URLSearchParams(location.search)}catch(e){}
+  var q0=sp&&sp.get('q');
+  if(q0&&q0.trim().length>=2){qi.value=q0;suggest(q0);search(q0);}
+  else{load(tabs.querySelector('button[data-n="'+h+'"]')?h:tabs.querySelector('button').dataset.n);
+    if(sp&&sp.has('q')&&qi){qi.focus();}}
 })();

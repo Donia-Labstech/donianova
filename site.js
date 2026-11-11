@@ -74,3 +74,29 @@
     fab.setAttribute('aria-expanded','true');inp.focus();}
   fab.addEventListener('click',open);
 })();
+
+/* 3D tilt + glare + glowing rim for product and category cards */
+(function(){
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce)return;
+  var SEL='.card,.cc', MAX=9;
+  function prep(el){if(el._t)return;el._t=1;el.classList.add('tilt');
+    var g=document.createElement('span');g.className='glare';g.setAttribute('aria-hidden','true');el.appendChild(g);
+    var r=document.createElement('span');r.className='rim';r.setAttribute('aria-hidden','true');el.appendChild(r);}
+  function move(el,x,y){var b=el.getBoundingClientRect(),px=(x-b.left)/b.width,py=(y-b.top)/b.height;
+    if(px<0||px>1||py<0||py>1)return;
+    el.style.setProperty('--ry',((px-.5)*2*MAX).toFixed(2)+'deg');
+    el.style.setProperty('--rx',((.5-py)*2*MAX).toFixed(2)+'deg');
+    el.style.setProperty('--gx',(px*100).toFixed(1)+'%');el.style.setProperty('--gy',(py*100).toFixed(1)+'%');
+    el.style.setProperty('--mx',(x-b.left)+'px');el.style.setProperty('--my',(y-b.top)+'px');}
+  function on(el){prep(el);el.classList.remove('enter');el.classList.add('tilting');}
+  function off(el){el.classList.remove('tilting');el.style.setProperty('--rx','0deg');el.style.setProperty('--ry','0deg');}
+  var cur=null;
+  document.addEventListener('pointerover',function(ev){var el=ev.target.closest&&ev.target.closest(SEL);if(!el||el===cur)return;if(cur)off(cur);cur=el;on(el);},{passive:true});
+  document.addEventListener('pointermove',function(ev){if(cur)move(cur,ev.clientX,ev.clientY);},{passive:true});
+  document.addEventListener('pointerout',function(ev){if(!cur)return;var to=ev.relatedTarget;if(to&&cur.contains(to))return;off(cur);cur=null;},{passive:true});
+  document.addEventListener('touchend',function(){if(cur){off(cur);cur=null;}},{passive:true});
+  document.addEventListener('animationend',function(ev){var t=ev.target;if(t.classList&&t.classList.contains('enter')&&t.matches(SEL))t.classList.remove('enter');});
+  function all(){document.querySelectorAll(SEL).forEach(prep);}
+  all(); if('MutationObserver' in window){new MutationObserver(function(){all()}).observe(document.body,{childList:true,subtree:true});}
+})();

@@ -82,11 +82,43 @@ const RULES = {
   receiptprn:{ min: 18, drop: /paper|roll|ورق|لفة/i }
 };
 
+// Free-text search: Arabic (or mixed) queries are turned into short English keywords,
+// because AliExpress matches English titles far better.
+async function toKeywords(q) {
+  if (!/[\u0600-\u06FF]/.test(q) || !process.env.DEEPSEEK_API_KEY) return q;
+  try {
+    const r = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.DEEPSEEK_API_KEY },
+      body: JSON.stringify({ model: 'deepseek-chat', temperature: 0, max_tokens: 20, messages: [
+        { role: 'system', content: 'Convert the shopping query into 2-6 short English AliExpress search keywords for the product itself (not accessories). Reply with the keywords only.' },
+        { role: 'user', content: q } ] })
+    });
+    const j = await r.json();
+    const kw = (j.choices && j.choices[0] && j.choices[0].message.content || '').replace(/[^\w\s\-+.]/g, ' ').replace(/\s+/g, ' ').trim();
+    return kw || q;
+  } catch (e) { return q; }
+}
+
 module.exports = async (req, res) => {
   if (!process.env.ALIEXPRESS_APP_KEY || !process.env.ALIEXPRESS_APP_SECRET) {
     return res.status(500).json({ error: 'missing_config' });
   }
   const q = req.query || {};
+  const text = String(q.q || '').replace(/[<>"'`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+  if (text.length >= 2) {
+    const lang = q.lang === 'ar' ? 'ar' : 'en';
+    try {
+      const kw = await toKeywords(text);
+      const items = (await ali.search(kw, { lang, size: 50 }))
+        .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
+        .slice(0, 24);
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+      return res.status(200).json({ q: text, kw, lang, updated: new Date().toISOString(), items });
+    } catch (e) {
+      return res.status(502).json({ error: e.message === 'upstream' ? 'upstream' : 'fetch_failed' });
+    }
+  }
   const niche = NICHES[q.niche] ? q.niche : 'audio';
   const lang = q.lang === 'ar' ? 'ar' : 'en';
   const trace = q.debug ? [] : null;
