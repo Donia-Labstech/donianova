@@ -1,10 +1,10 @@
 {
  "cleanUrls": false,
  "trailingSlash": true,
- "crons": [
+ "rewrites": [
   {
-   "path": "/api/daily",
-   "schedule": "0 18 * * *"
+   "source": "/daily.xml",
+   "destination": "/api/feed"
   }
  ],
  "headers": [

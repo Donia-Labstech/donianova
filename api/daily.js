@@ -39,6 +39,22 @@ async function postToFacebook(message, link) {
   return r.json();
 }
 
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+// Build today's comparison (used by the cron endpoint and by the RSS feed).
+async function buildToday(forced) {
+  const niche = products.NICHES[forced] ? forced : pickNiche(new Date());
+  const items = await products.nicheItems(niche, 'ar');
+  const top = items.filter(p => p.link).sort((a, b) => score(b) - score(a)).slice(0, 3);
+  if (top.length < 2) return { niche, skipped: 'not_enough_items' };
+  const { post, winner, usage } = await writePost(niche, top);
+  const message = post +
+    `\n\n🛒 رابط المنتج (رابط عمولة، لا يكلّفك شيئاً إضافياً):\n${winner.link}` +
+    `\n\n🔎 قارن المزيد من ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
+    `\n\n#DoniaNova #مقارنة_اليوم`;
+  return { niche, post, message, winner, tokens: usage && usage.total_tokens };
+}
+
 module.exports = async (req, res) => {
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.authorization || '';
@@ -46,22 +62,16 @@ module.exports = async (req, res) => {
   if (!secret || (auth !== 'Bearer ' + secret && q.key !== secret)) return res.status(401).json({ error: 'unauthorized' });
   if (!process.env.DEEPSEEK_API_KEY) return res.status(500).json({ error: 'missing_deepseek' });
 
-  const niche = products.NICHES[q.niche] ? q.niche : pickNiche(new Date());
   try {
-    const items = await products.nicheItems(niche, 'ar');
-    const top = items.filter(p => p.link).sort((a, b) => score(b) - score(a)).slice(0, 3);
-    if (top.length < 2) return res.status(200).json({ niche, skipped: 'not_enough_items' });
-
-    const { post, winner, usage } = await writePost(niche, top);
-    const message = post +
-      `\n\n🛒 رابط ${'المنتج'} (رابط عمولة، لا يكلّفك شيئاً إضافياً):\n${winner.link}` +
-      `\n\n🔎 قارن المزيد من ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
-      `\n\n#DoniaNova #مقارنة_اليوم`;
-
+    const t = await buildToday(q.niche);
+    if (t.skipped) return res.status(200).json(t);
+    const { niche, message, winner } = t;
     const dry = q.dry === '1' || !process.env.FB_PAGE_ID || !process.env.FB_PAGE_TOKEN;
     const fb = dry ? { dry: true } : await postToFacebook(message, winner.link);
-    return res.status(200).json({ niche, message, fb, tokens: usage && usage.total_tokens });
+    return res.status(200).json({ niche, message, fb, tokens: t.tokens });
   } catch (e) {
-    return res.status(502).json({ niche, error: String(e.message || e) });
+    return res.status(502).json({ error: String(e.message || e) });
   }
 };
+module.exports.buildToday = buildToday;
+module.exports.esc = esc;
