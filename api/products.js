@@ -52,6 +52,9 @@ const NICHES = {
   organizer: 'electronics organizer travel bag'
 };
 
+// Never list spy / covert-surveillance gear (illegal in many countries, against our values)
+const BANNED = /\bspy\b|hidden (camera|recorder)|covert|eavesdrop|wiretap|bug detector|تجسس|الجاسوس|جاسوس|تنصت|مخفي|خفية/i;
+
 // Per-niche guards: drop accessories that match the keywords but are not the product itself
 const ACCESSORY = /enclosure|case|adapter|caddy|حافظة|علبة|الضميمة|محول|صندوق|غلاف|حاوية/i;
 const RULES = {
@@ -111,6 +114,7 @@ module.exports = async (req, res) => {
     try {
       const kw = await toKeywords(text);
       const items = (await ali.search(kw, { lang, size: 50 }))
+        .filter(p => !BANNED.test(p.title))
         .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
         .slice(0, 24);
       res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
@@ -125,6 +129,7 @@ module.exports = async (req, res) => {
   try {
     const rule = RULES[niche] || {};
     const items = (await ali.search(NICHES[niche], { lang, size: 50, trace }))
+      .filter(p => !BANNED.test(p.title))
       .filter(p => !(rule.min && Number(p.price) < rule.min))
       .filter(p => !(rule.drop && rule.drop.test(p.title)))
       .filter(p => !(rule.keep && !rule.keep.test(p.title)))

@@ -21,6 +21,7 @@ function system(lang) {
     '2. For any tech, phone-accessory, storage, teaching or travel product NOT in the catalog (barcode scanners, SSDs, hard drives, memory cards, chargers, power banks, webcams, projectors/data show, portable monitors, voice recorders, gimbals, AI translators, translation pens, label/receipt printers, etc.), or when the visitor asks to COMPARE products, call the tool search_aliexpress with short English keywords. Use only the returned data. Ignore results that are accessories or a different product than requested (e.g. an SSD enclosure when the visitor wants an SSD); if needed search again with more precise keywords.',
     '3. Comparisons: compare 2 to 4 products in a compact markdown table (columns: product, price, rating, sold) using only tool data, then 2-3 lines on who each one suits, then a clear honest verdict. After the table, give each product link on its own line as: 🛒 short name: link',
     '4. Never invent specs, prices, ratings, stock or shipping times. If a value is missing write "—". Say prices are live from AliExpress and may change.',
+    'Never recommend spy, hidden or covert recording/surveillance devices; politely refuse such requests.',
     '5. Keep answers concise. Stay on topic (choosing tech/teaching/travel products, using them, the site). Politely decline anything else in one sentence.',
     '6. If asked, say links are affiliate links that cost the buyer nothing extra.',
     '7. If nothing fits, say so honestly and suggest the live deals page: /' + lang + '/deals/',
