@@ -86,4 +86,19 @@ async function search(keywords, opts) {
   return list.filter(p => p.promotion_link && p.product_main_image_url).map(mapItem);
 }
 
-module.exports = { search, mode: () => goodMode };
+// Short affiliate link (s.click.aliexpress.com/e/_xxx) for one product — Facebook rejects the very long /s/ links.
+async function shortLink(productId) {
+  try {
+    const j = await call('aliexpress.affiliate.link.generate', {
+      promotion_link_type: '0',
+      source_values: 'https://www.aliexpress.com/item/' + String(productId).replace(/\D/g, '') + '.html',
+      tracking_id: process.env.ALIEXPRESS_TRACKING_ID || 'default'
+    });
+    const rr = j && j.aliexpress_affiliate_link_generate_response && j.aliexpress_affiliate_link_generate_response.resp_result;
+    const l = rr && rr.result && rr.result.promotion_links && rr.result.promotion_links.promotion_link;
+    const link = Array.isArray(l) && l[0] && l[0].promotion_link;
+    return link && link.length < 120 ? link : null;
+  } catch (e) { return null; }
+}
+
+module.exports = { search, shortLink, mode: () => goodMode };

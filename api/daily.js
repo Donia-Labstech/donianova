@@ -48,6 +48,9 @@ async function buildToday(forced) {
   const top = items.filter(p => p.link).sort((a, b) => score(b) - score(a)).slice(0, 3);
   if (top.length < 2) return { niche, skipped: 'not_enough_items' };
   const { post, winner, usage } = await writePost(niche, top);
+  // Facebook needs a short link: ask AliExpress for one, else fall back to our own category page.
+  const short = await require('./_ali.js').shortLink(winner.id);
+  winner.link = short || `${SITE}/ar/deals/#${niche}`;
   const message = post +
     `\n\n🛒 رابط المنتج (رابط عمولة، لا يكلّفك شيئاً إضافياً):\n${winner.link}` +
     `\n\n🔎 قارن المزيد من ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
