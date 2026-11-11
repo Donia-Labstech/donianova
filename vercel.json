@@ -1,6 +1,12 @@
 {
  "cleanUrls": false,
  "trailingSlash": true,
+ "crons": [
+  {
+   "path": "/api/daily",
+   "schedule": "0 18 * * *"
+  }
+ ],
  "headers": [
   {
    "source": "/img/(.*)",

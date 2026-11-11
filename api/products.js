@@ -103,6 +103,18 @@ async function toKeywords(q) {
   } catch (e) { return q; }
 }
 
+async function nicheItems(niche, lang, trace) {
+  const rule = RULES[niche] || {};
+  return (await ali.search(NICHES[niche], { lang, size: 50, trace }))
+    .filter(p => !BANNED.test(p.title))
+    .filter(p => !(rule.min && Number(p.price) < rule.min))
+    .filter(p => !(rule.drop && rule.drop.test(p.title)))
+    .filter(p => !(rule.keep && !rule.keep.test(p.title)))
+    // quality guard: hide poorly rated listings (keeps new items that have no rating yet)
+    .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
+    .slice(0, 16);
+}
+
 module.exports = async (req, res) => {
   if (!process.env.ALIEXPRESS_APP_KEY || !process.env.ALIEXPRESS_APP_SECRET) {
     return res.status(500).json({ error: 'missing_config' });
@@ -127,15 +139,7 @@ module.exports = async (req, res) => {
   const lang = q.lang === 'ar' ? 'ar' : 'en';
   const trace = q.debug ? [] : null;
   try {
-    const rule = RULES[niche] || {};
-    const items = (await ali.search(NICHES[niche], { lang, size: 50, trace }))
-      .filter(p => !BANNED.test(p.title))
-      .filter(p => !(rule.min && Number(p.price) < rule.min))
-      .filter(p => !(rule.drop && rule.drop.test(p.title)))
-      .filter(p => !(rule.keep && !rule.keep.test(p.title)))
-      // quality guard: hide poorly rated listings (keeps new items that have no rating yet)
-      .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
-      .slice(0, 16);
+    const items = await nicheItems(niche, lang, trace);
     res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).json({ niche, lang, updated: new Date().toISOString(), items, mode: ali.mode(), trace: trace || undefined });
   } catch (e) {
@@ -143,3 +147,4 @@ module.exports = async (req, res) => {
   }
 };
 module.exports.NICHES = NICHES;
+module.exports.nicheItems = nicheItems;
