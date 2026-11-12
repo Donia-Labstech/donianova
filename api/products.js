@@ -70,7 +70,7 @@ const RULES = {
   board:    { min: 3 },
   recorder: { min: 8, drop: /case|bag|حقيبة|غطاء/i },
   ringlight:{ min: 4 },
-  gimbal:   { min: 12 },
+  gimbal:   { min: 12, keep: /gimbal|stabili[sz]er|osmo|مثبت|جيمبال/i },
   actioncam:{ min: 25, drop: /mount|case|strap|battery|حامل|بطارية|حزام/i },
   translator:{ min: 15, drop: /case|bag|protector|حقيبة|غطاء|واقي/i },
   transbuds:{ min: 8 },

@@ -19,8 +19,11 @@ function score(p) {                                     // sold volume weighted 
 // Precise numbers are computed here, not by the model.
 function facts(p) {
   const price = Number(p.price) || 0, orig = Number(p.orig) || price;
-  const off = orig > price ? Math.round((1 - price / orig) * 100) : 0;
-  return { price, orig, off, save: +(orig - price).toFixed(2), rating: parseFloat(p.rating) || 0, sold: Number(p.sold) || 0 };
+  let off = orig > price ? Math.round((1 - price / orig) * 100) : 0;
+  // Discounts of 60%+ usually come from an inflated "original" price: don't use them as an anchor.
+  const trusted = off > 0 && off < 60;
+  if (!trusted) off = 0;
+  return { price, orig: trusted ? orig : price, off, save: trusted ? +(orig - price).toFixed(2) : 0, rating: parseFloat(p.rating) || 0, sold: Number(p.sold) || 0 };
 }
 function valueScore(f, minPrice) {          // quality + social proof + price advantage
   return (f.rating || 90) * 0.5 + Math.log10(f.sold + 10) * 12 + (minPrice / (f.price || minPrice)) * 25 + f.off * 0.1;
@@ -45,7 +48,7 @@ async function writePost(niche, top) {
     'Honest marketing psychology: social proof (units sold, rating), price anchoring (old price -> new price, exact saving), loss aversion stated truthfully ("prices on AliExpress change daily"), clarity of choice (one clear winner).',
     'Use strong Arabic action keywords naturally: اطلبه الآن، احصل عليه، وفّر، اكتشف، لا تفوّت.',
     'Format exactly:',
-    'line 1: hook with emoji and the biggest real saving or the category benefit (max 12 words)',
+    'line 1: hook with emoji about the WINNER (its real saving, rating or sales) or the category benefit (max 12 words). Never sum or exaggerate savings.',
     'then one line per product: "1️⃣ <short name with 1 key spec from title> — $<price> بدل $<old> (‑<off>%) — ⭐<rating> — 🛒<sold> مبيع — <one precise pro or con>". Omit the "بدل" part if there is no discount.',
     'then: "🏆 اختيارنا: <winner short name> — <reason with numbers>" (the winner is given; do not change it).',
     'then: "👇 <one action sentence>"',
@@ -63,7 +66,9 @@ async function writePost(niche, top) {
   const txt = j.choices && j.choices[0] && j.choices[0].message.content || '';
   const m = txt.match(/\{[\s\S]*\}/);
   const out = JSON.parse(m ? m[0] : txt);
-  const hashtags = (Array.isArray(out.hashtags) ? out.hashtags : []).slice(0, 3)
+  const raw = out.hashtags || out.tags || out.hashtag || [];
+  const list = (Array.isArray(raw) ? raw : String(raw).split(/[\s,،]+/)).concat([NAMES.ar[niche] || '']);
+  const hashtags = [...new Set(list.map(h => String(h).replace(/^#/, '').trim()).filter(Boolean))].slice(0, 3)
     .map(h => '#' + String(h).replace(/^#/, '').trim().replace(/\s+/g, '_')).filter(h => h.length > 2);
   return { post: String(out.post || '').trim(), winner: top[wi], hashtags, usage: j.usage };
 }
