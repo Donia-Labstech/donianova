@@ -16,21 +16,56 @@ function score(p) {                                     // sold volume weighted 
   return Math.log10(s + 10) * r;
 }
 
+// Precise numbers are computed here, not by the model.
+function facts(p) {
+  const price = Number(p.price) || 0, orig = Number(p.orig) || price;
+  const off = orig > price ? Math.round((1 - price / orig) * 100) : 0;
+  return { price, orig, off, save: +(orig - price).toFixed(2), rating: parseFloat(p.rating) || 0, sold: Number(p.sold) || 0 };
+}
+function valueScore(f, minPrice) {          // quality + social proof + price advantage
+  return (f.rating || 90) * 0.5 + Math.log10(f.sold + 10) * 12 + (minPrice / (f.price || minPrice)) * 25 + f.off * 0.1;
+}
+
 async function writePost(niche, top) {
-  const facts = top.map((p, i) => `${i + 1}) ${p.title.slice(0, 90)} | $${p.price} (was $${p.orig}) | rating ${p.rating || 'new'} | sold ${p.sold}`).join('\n');
+  const F = top.map(facts);
+  const minPrice = Math.min(...F.map(f => f.price || Infinity));
+  const scores = F.map(f => valueScore(f, minPrice));
+  const wi = scores.indexOf(Math.max(...scores));
+  const cheapest = F.findIndex(f => f.price === minPrice);
+  const topRated = F.reduce((b, f, i) => f.rating > F[b].rating ? i : b, 0);
+  const bestSeller = F.reduce((b, f, i) => f.sold > F[b].sold ? i : b, 0);
+  const lines = top.map((p, i) => {
+    const f = F[i];
+    return `${i + 1}) title: ${p.title.slice(0, 110)}\n   price $${f.price}${f.off ? ` (was $${f.orig}, -${f.off}%, saves $${f.save})` : ''} | rating ${f.rating ? f.rating + '%' : 'new'} | sold ${f.sold}`;
+  }).join('\n');
+  const tags = `cheapest=${cheapest + 1}; top_rated=${topRated + 1}; best_seller=${bestSeller + 1}; best_value(winner)=${wi + 1}`;
+  const sys = [
+    'You write Arabic Facebook posts for DoniaNova, a tech deals page. Be precise and honest, persuasive through facts.',
+    'Use ONLY the given data. Specs may come only from the product title (capacity, Bluetooth version, size...). Never invent specs, stock levels or deadlines.',
+    'Honest marketing psychology: social proof (units sold, rating), price anchoring (old price -> new price, exact saving), loss aversion stated truthfully ("prices on AliExpress change daily"), clarity of choice (one clear winner).',
+    'Use strong Arabic action keywords naturally: اطلبه الآن، احصل عليه، وفّر، اكتشف، لا تفوّت.',
+    'Format exactly:',
+    'line 1: hook with emoji and the biggest real saving or the category benefit (max 12 words)',
+    'then one line per product: "1️⃣ <short name with 1 key spec from title> — $<price> بدل $<old> (‑<off>%) — ⭐<rating> — 🛒<sold> مبيع — <one precise pro or con>". Omit the "بدل" part if there is no discount.',
+    'then: "🏆 اختيارنا: <winner short name> — <reason with numbers>" (the winner is given; do not change it).',
+    'then: "👇 <one action sentence>"',
+    'Max 120 words. No links, no hashtags.',
+    'Output JSON only: {"post":"...","hashtags":["3 short Arabic hashtags for this category, without #"]}'
+  ].join('\n');
   const r = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.DEEPSEEK_API_KEY },
-    body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.4, max_tokens: 380, messages: [
-      { role: 'system', content: 'You write short, honest Arabic Facebook posts for DoniaNova, a tech deals page. Use ONLY the given facts; never invent specs, never fake urgency. Format: a catchy first line with an emoji; then 3 lines, one per product: short name — price — rating — one honest pro or con; then a line starting with "🏆 اختيارنا:" naming the best value and why in one sentence. Max 90 words. No hashtags, no links (they are added later). Output JSON only: {"post":"...","winner":1|2|3}' },
-      { role: 'user', content: `Category: ${NAMES.ar[niche] || niche}\n${facts}` } ] })
+    body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.35, max_tokens: 520, response_format: { type: 'json_object' }, messages: [
+      { role: 'system', content: sys },
+      { role: 'user', content: `Category: ${NAMES.ar[niche] || niche}\n${lines}\nFacts: ${tags}` } ] })
   });
   const j = await r.json();
   const txt = j.choices && j.choices[0] && j.choices[0].message.content || '';
   const m = txt.match(/\{[\s\S]*\}/);
   const out = JSON.parse(m ? m[0] : txt);
-  const w = Math.min(Math.max(parseInt(out.winner, 10) || 1, 1), top.length);
-  return { post: String(out.post || '').trim(), winner: top[w - 1], usage: j.usage };
+  const hashtags = (Array.isArray(out.hashtags) ? out.hashtags : []).slice(0, 3)
+    .map(h => '#' + String(h).replace(/^#/, '').trim().replace(/\s+/g, '_')).filter(h => h.length > 2);
+  return { post: String(out.post || '').trim(), winner: top[wi], hashtags, usage: j.usage };
 }
 
 async function postToFacebook(message, link) {
@@ -47,14 +82,14 @@ async function buildToday(forced) {
   const items = await products.nicheItems(niche, 'ar');
   const top = items.filter(p => p.link).sort((a, b) => score(b) - score(a)).slice(0, 3);
   if (top.length < 2) return { niche, skipped: 'not_enough_items' };
-  const { post, winner, usage } = await writePost(niche, top);
+  const { post, winner, hashtags, usage } = await writePost(niche, top);
   // Facebook needs a short link: ask AliExpress for one, else fall back to our own category page.
   const short = await require('./_ali.js').shortLink(winner.id);
   winner.link = short || `${SITE}/ar/deals/#${niche}`;
   const message = post +
-    `\n\n🛒 رابط المنتج (رابط عمولة، لا يكلّفك شيئاً إضافياً):\n${winner.link}` +
-    `\n\n🔎 قارن المزيد من ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
-    `\n\n#DoniaNova #مقارنة_اليوم`;
+    `\n\n🛒 اطلبه الآن بأفضل سعر:\n${winner.link}` +
+    `\n\n🔎 قارن كل عروض ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
+    '\n\n' + [...hashtags, '#عروض_اليوم', '#تخفيضات', '#علي_إكسبريس', '#DoniaNova', '#رابط_شراكة'].join(' ');
   return { niche, post, message, winner, tokens: usage && usage.total_tokens };
 }
 
