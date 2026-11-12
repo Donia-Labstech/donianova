@@ -41,14 +41,14 @@ async function writePost(niche, top) {
     const f = F[i];
     return `${i + 1}) title: ${p.title.slice(0, 110)}\n   price $${f.price}${f.off ? ` (was $${f.orig}, -${f.off}%, saves $${f.save})` : ''} | rating ${f.rating ? f.rating + '%' : 'new'} | sold ${f.sold}`;
   }).join('\n');
-  const tags = `cheapest=${cheapest + 1}; top_rated=${topRated + 1}; best_seller=${bestSeller + 1}; best_value(winner)=${wi + 1}`;
+  const tags = `cheapest=${cheapest + 1}; top_rated=${topRated + 1}; best_seller=${bestSeller + 1}; best_value(winner)=${wi + 1} (${top[wi].title.slice(0, 40)})`;
   const sys = [
     'You write Arabic Facebook posts for DoniaNova, a tech deals page. Be precise and honest, persuasive through facts.',
     'Use ONLY the given data. Specs may come only from the product title (capacity, Bluetooth version, size...). Never invent specs, stock levels or deadlines.',
     'Honest marketing psychology: social proof (units sold, rating), price anchoring (old price -> new price, exact saving), loss aversion stated truthfully ("prices on AliExpress change daily"), clarity of choice (one clear winner).',
     'Use strong Arabic action keywords naturally: اطلبه الآن، احصل عليه، وفّر، اكتشف، لا تفوّت.',
     'Format exactly:',
-    'line 1: hook with emoji about the WINNER (its real saving, rating or sales) or the category benefit (max 12 words). Never sum or exaggerate savings.',
+    'line 1: hook with emoji that names the WINNER and one of ITS real numbers (price, rating or sales). Never use another product\'s saving in the hook. Max 12 words.',
     'then one line per product: "1️⃣ <short name with 1 key spec from title> — $<price> بدل $<old> (‑<off>%) — ⭐<rating> — 🛒<sold> مبيع — <one precise pro or con>". Omit the "بدل" part if there is no discount.',
     'then: "🏆 اختيارنا: <winner short name> — <reason with numbers>" (the winner is given; do not change it).',
     'then: "👇 <one action sentence>"',
