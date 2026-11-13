@@ -7,7 +7,8 @@ const ali = require('./_ali.js');
 const NAMES = require('./_names.js');
 const SITE = 'https://donianova.vercel.app';
 const TG = m => `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/${m}`;
-const hookSecret = () => crypto.createHash('sha256').update('tg:' + (process.env.CRON_SECRET || '')).digest('hex').slice(0, 48);
+// derived from the bot token (stable), so changing CRON_SECRET never breaks the bot
+const hookSecret = () => crypto.createHash('sha256').update('tg-hook:' + (process.env.TELEGRAM_BOT_TOKEN || '')).digest('hex').slice(0, 48);
 
 async function api(method, body) {
   const r = await fetch(TG(method), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -60,8 +61,6 @@ const WELCOME = '👋 أهلاً بك في <b>DoniaNova</b>\n\nأساعدك تخ
 
 // Point Telegram to this endpoint (idempotent; it can only ever point to our own URL).
 async function ensureWebhook() {
-  const info = await api('getWebhookInfo', {});
-  if (info.result && info.result.url === SITE + '/api/telegram/') return info;
   await api('setMyCommands', { commands: [
     { command: 'start', description: 'البداية والأقسام' }, { command: 'today', description: 'مقارنة اليوم' }, { command: 'deals', description: 'تصفّح الأقسام' }] });
   return api('setWebhook', { url: SITE + '/api/telegram/', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
