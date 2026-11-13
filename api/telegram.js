@@ -60,10 +60,10 @@ const WELCOME = '👋 أهلاً بك في <b>DoniaNova</b>\n\nأساعدك تخ
 // Point Telegram to this endpoint (idempotent; it can only ever point to our own URL).
 async function ensureWebhook() {
   const info = await api('getWebhookInfo', {});
-  if (info.result && info.result.url === SITE + '/api/telegram') return info;
+  if (info.result && info.result.url === SITE + '/api/telegram/') return info;
   await api('setMyCommands', { commands: [
     { command: 'start', description: 'البداية والأقسام' }, { command: 'today', description: 'مقارنة اليوم' }, { command: 'deals', description: 'تصفّح الأقسام' }] });
-  return api('setWebhook', { url: SITE + '/api/telegram', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
+  return api('setWebhook', { url: SITE + '/api/telegram/', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
 }
 
 module.exports = async (req, res) => {
@@ -87,7 +87,7 @@ module.exports = async (req, res) => {
   // one-time webhook setup
   if (q.setup) {
     if (!key || q.key !== key) return res.status(401).json({ error: 'unauthorized' });
-    const a = await api('setWebhook', { url: SITE + '/api/telegram', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
+    const a = await api('setWebhook', { url: SITE + '/api/telegram/', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
     const b = await api('setMyCommands', { commands: [
       { command: 'start', description: 'البداية والأقسام' }, { command: 'today', description: 'مقارنة اليوم' }, { command: 'deals', description: 'تصفّح الأقسام' }] });
     const me = await api('getMe', {});
