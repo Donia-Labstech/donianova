@@ -14,7 +14,7 @@ module.exports = async (req, res) => {
       top: (t.top || []).map(p => ({ title: p.title, img: p.img, price: p.price, rating: p.rating, sold: p.sold }))
     });
   } catch (e) {
-    res.setHeader('Cache-Control', 's-maxage=300');
+    res.setHeader('Cache-Control', 'no-store');
     return res.status(502).json({ error: 'unavailable' });
   }
 };
