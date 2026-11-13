@@ -57,14 +57,28 @@ async function sendToday(chat) {
 
 const WELCOME = '👋 أهلاً بك في <b>DoniaNova</b>\n\nأساعدك تختار أجهزة التقنية والتعليم والسفر من علي إكسبريس <b>بأرقام حقيقية</b>: السعر، التقييم، والمبيعات.\n\n✍️ اكتب اسم أي منتج (مثلاً: <i>قارئ باركود</i> أو <i>SSD 1TB</i>)\n👇 أو اختر قسماً:';
 
+// Point Telegram to this endpoint (idempotent; it can only ever point to our own URL).
+async function ensureWebhook() {
+  const info = await api('getWebhookInfo', {});
+  if (info.result && info.result.url === SITE + '/api/telegram') return info;
+  await api('setMyCommands', { commands: [
+    { command: 'start', description: 'البداية والأقسام' }, { command: 'today', description: 'مقارنة اليوم' }, { command: 'deals', description: 'تصفّح الأقسام' }] });
+  return api('setWebhook', { url: SITE + '/api/telegram', secret_token: hookSecret(), allowed_updates: ['message', 'callback_query'] });
+}
+
 module.exports = async (req, res) => {
   const q = req.query || {};
   const key = process.env.CRON_SECRET;
   // public link used by the site: redirect to the bot's t.me page
   if (q.go) {
     let to = SITE + '/ar/';
-    try { if (process.env.TELEGRAM_BOT_TOKEN) { const me = await api('getMe', {}); if (me.result && me.result.username) to = 'https://t.me/' + me.result.username; } } catch (e) {}
-    res.setHeader('Cache-Control', 's-maxage=86400');
+    try {
+      if (process.env.TELEGRAM_BOT_TOKEN) {
+        const me = await api('getMe', {}); if (me.result && me.result.username) to = 'https://t.me/' + me.result.username;
+        await ensureWebhook();   // self-setup: no secret link needed
+      }
+    } catch (e) {}
+    res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Location', to);
     return res.status(302).end();
   }
