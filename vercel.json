@@ -7,6 +7,12 @@
    "destination": "/api/feed"
   }
  ],
+ "crons": [
+  {
+   "path": "/api/telegram?daily=1",
+   "schedule": "30 7 * * *"
+  }
+ ],
  "headers": [
   {
    "source": "/img/(.*)",

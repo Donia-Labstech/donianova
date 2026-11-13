@@ -95,7 +95,7 @@ async function buildToday(forced) {
     `\n\n🛒 اطلبه الآن بأفضل سعر:\n${winner.link}` +
     `\n\n🔎 قارن كل عروض ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
     '\n\n' + [...hashtags, '#عروض_اليوم', '#تخفيضات', '#علي_إكسبريس', '#DoniaNova', '#رابط_شراكة'].join(' ');
-  return { niche, post, message, winner, tokens: usage && usage.total_tokens };
+  return { niche, post, message, winner, top, tokens: usage && usage.total_tokens };
 }
 
 module.exports = async (req, res) => {

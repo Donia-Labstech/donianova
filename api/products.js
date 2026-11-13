@@ -148,3 +148,10 @@ module.exports = async (req, res) => {
 };
 module.exports.NICHES = NICHES;
 module.exports.nicheItems = nicheItems;
+module.exports.searchText = async (text, lang) => {
+  const kw = await toKeywords(text);
+  const items = (await ali.search(kw, { lang, size: 50 }))
+    .filter(p => !BANNED.test(p.title))
+    .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); });
+  return { kw, items };
+};
