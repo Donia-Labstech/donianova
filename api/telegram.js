@@ -118,6 +118,21 @@ module.exports = async (req, res) => {
       const chat = u.message.chat.id, text = u.message.text.trim();
       if (/^\/start|^\/deals/.test(text)) await api('sendMessage', { chat_id: chat, text: WELCOME, parse_mode: 'HTML', reply_markup: menuKeyboard() });
       else if (/^\/today/.test(text)) await sendToday(chat);
+      else if (/^\/post/.test(text)) {
+        // owner-only: publish today's comparison to the channel now (checked against channel admins)
+        const ch = process.env.TELEGRAM_CHANNEL;
+        if (!ch) { await api('sendMessage', { chat_id: chat, text: '⚠️ لم يُضبط TELEGRAM_CHANNEL في Vercel بعد.' }); }
+        else {
+          const m = await api('getChatMember', { chat_id: ch, user_id: u.message.from.id });
+          const st = m.result && m.result.status;
+          if (st === 'creator' || st === 'administrator') {
+            const r = await sendToday(ch);
+            await api('sendMessage', { chat_id: chat, text: r && r.ok ? '✅ نُشرت مقارنة اليوم في ' + ch : '❌ تعذّر النشر: ' + ((r && r.description) || (m && m.description) || 'خطأ غير معروف') });
+          } else {
+            await api('sendMessage', { chat_id: chat, text: m.ok ? '⛔ هذا الأمر لمشرفي القناة فقط.' : '❌ لا أستطيع الوصول إلى ' + ch + ': ' + (m.description || '') + '\nتأكد أن البوت مشرف في القناة وأن الاسم صحيح.' });
+          }
+        }
+      }
       else if (text.length >= 2 && text.length <= 80) {
         await api('sendChatAction', { chat_id: chat, action: 'typing' });
         const { items } = await products.searchText(text, 'ar');
