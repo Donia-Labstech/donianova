@@ -48,7 +48,7 @@ async function writePost(niche, top) {
     'Honest marketing psychology: social proof (units sold, rating), price anchoring (old price -> new price, exact saving), loss aversion stated truthfully ("prices on AliExpress change daily"), clarity of choice (one clear winner).',
     'Use strong Arabic action keywords naturally: اطلبه الآن، احصل عليه، وفّر، اكتشف، لا تفوّت.',
     'Format exactly:',
-    'line 1: hook with emoji that names the WINNER and one of ITS real numbers (price, rating or sales). Never use another product\'s saving in the hook. Max 12 words.',
+    'line 1: a short hook (it will be replaced by the system, keep it under 8 words).',
     'then one line per product: "1️⃣ <short name with 1 key spec from title> — $<price> بدل $<old> (‑<off>%) — ⭐<rating> — 🛒<sold> مبيع — <one precise pro or con>". Omit the "بدل" part if there is no discount.',
     'then: "🏆 اختيارنا: <winner short name> — <reason with numbers>" (the winner is given; do not change it).',
     'then: "👇 <one action sentence>"',
@@ -70,7 +70,13 @@ async function writePost(niche, top) {
   const list = (Array.isArray(raw) ? raw : String(raw).split(/[\s,،]+/)).concat([NAMES.ar[niche] || '']);
   const hashtags = [...new Set(list.map(h => String(h).replace(/^#/, '').trim()).filter(Boolean))].slice(0, 3)
     .map(h => '#' + String(h).replace(/^#/, '').trim().replace(/\s+/g, '_')).filter(h => h.length > 2);
-  return { post: String(out.post || '').trim(), winner: top[wi], hashtags, usage: j.usage };
+  const wf = F[wi];
+  const wname = top[wi].title.replace(/[|،,(（].*$/, '').split(/\s+/).slice(0, 5).join(' ');
+  const hook = `🏆 اختيار اليوم في ${NAMES.ar[niche] || ''}: ${wname} — $${wf.price}` +
+    (wf.off ? ` (وفّر ${wf.off}%)` : '') + (wf.rating ? ` · ⭐${wf.rating}%` : '') + (wf.sold ? ` · 🛒${wf.sold} مبيع` : '');
+  const body = String(out.post || '').trim().split('\n');
+  if (body.length && !/^\s*1️⃣/.test(body[0])) body.shift();   // drop the model's own hook line
+  return { post: [hook].concat(body).join('\n'), winner: top[wi], hashtags, usage: j.usage };
 }
 
 async function postToFacebook(message, link) {

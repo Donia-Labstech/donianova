@@ -71,7 +71,7 @@ const RULES = {
   recorder: { min: 8, drop: /case|bag|حقيبة|غطاء/i },
   ringlight:{ min: 4 },
   gimbal:   { min: 12, keep: /gimbal|stabili[sz]er|osmo|مثبت|جيمبال/i },
-  actioncam:{ min: 25, drop: /mount|case|strap|battery|حامل|بطارية|حزام/i },
+  actioncam:{ min: 25, drop: /mount|case|strap|battery|memory card|micro ?sd|tf card|sd card|حامل|بطارية|حزام|بطاقة ذاكرة|مايكرو/i, keep: /camera|cam\b|كاميرا|osmo|gopro|insta360/i },
   translator:{ min: 15, drop: /case|bag|protector|حقيبة|غطاء|واقي/i },
   transbuds:{ min: 8 },
   scanpen:  { min: 15, drop: /refill|case|غطاء/i },
