@@ -417,6 +417,7 @@ html[dir="ltr"] .cc:hover .cc-cta em{transform:translateX(5px)}
 .tg-ic{flex:none;width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)}
 .tg-t{flex:1;min-width:220px}.tg-t h2{margin:0 0 4px;color:#fff;font-size:22px}.tg-t p{margin:0;opacity:.9;font-size:14.5px}
 .tg-btn{background:#fff!important;color:#1A6FD0!important;font-weight:700}
+.tg-bs{display:flex;flex-wrap:wrap;gap:10px}.tg-btn2{background:rgba(255,255,255,.14)!important;color:#fff!important;border:1px solid rgba(255,255,255,.4)!important;font-weight:700}
 .brands{padding-block:30px 40px!important;overflow:hidden}
 .brands p{text-align:center;color:var(--muted);font-size:13.5px;letter-spacing:.04em;margin:0 0 12px}
 .marq{overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}

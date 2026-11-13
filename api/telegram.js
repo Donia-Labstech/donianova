@@ -22,6 +22,7 @@ function menuKeyboard() {
   for (let i = 0; i < MENU.length; i += 2) rows.push(MENU.slice(i, i + 2).map(k => ({ text: NAMES.ar[k] || k, callback_data: 'cat:' + k })));
   rows.unshift([{ text: '🏆 مقارنة اليوم', callback_data: 'today' }]);
   rows.push([{ text: '🌐 كل الأقسام في الموقع', url: SITE + '/ar/deals/' }]);
+  rows.push([{ text: '📢 قناة العروض اليومية', url: 'https://t.me/donianova_deals' }]);
   return { inline_keyboard: rows };
 }
 
