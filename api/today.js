@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
     if (t.skipped) throw new Error('skipped');
     res.setHeader('Cache-Control', `s-maxage=${secsLeft}`);
     return res.status(200).json({
-      day: now.toISOString().slice(0, 10), niche: t.niche, post: t.post, message: t.message,
+      day: now.toISOString().slice(0, 10), niche: t.niche, post: t.post, posts: t.posts, names: t.names, wi: t.wi, message: t.message,
       winner: { title: t.winner.title, img: t.winner.img, price: t.winner.price, rating: t.winner.rating, sold: t.winner.sold, link: t.winner.link },
       top: (t.top || []).map(p => ({ title: p.title, img: p.img, price: p.price, rating: p.rating, sold: p.sold }))
     });

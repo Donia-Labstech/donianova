@@ -80,9 +80,9 @@
 <script>(function(){var T={"h": "🏆 Le comparatif du jour", "p": "Chaque jour, notre agent IA compare les 3 meilleurs produits d'un rayon avec des chiffres réels et choisit le meilleur rapport qualité-prix.", "win": "Le choix du jour", "buy": "🛒 Je le veux", "more": "Comparer tout le rayon", "sold": "vendus"},L='fr';function x(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 fetch('/api/today').then(function(r){return r.json()}).then(function(t){if(!t||t.error||!t.winner)return;var top=(t.top||[]).slice(0,3),w=t.winner;
 var others=top.filter(function(p){return p.title!==w.title}).slice(0,2);
-var lines=String(t.post||'').split('\n').filter(Boolean);
+var lines=String((t.posts&&t.posts[L])||t.post||'').split('\n').filter(Boolean);
 var box=document.getElementById('todayBox');
-box.innerHTML='<article class="tw card"><span class="tw-badge">'+x(T.win)+'</span><img src="'+x(w.img)+'" alt="" loading="lazy"><div class="tw-b"><h3>'+x(w.title.slice(0,90))+'</h3><div class="tw-m"><b>$'+x(w.price)+'</b><span>⭐ '+x(w.rating||'—')+'</span><span>🛒 '+x(w.sold)+' '+x(T.sold)+'</span></div><a class="go buy" href="'+x(w.link)+'" target="_blank" rel="sponsored nofollow noopener">'+x(T.buy)+'</a></div></article>'
+box.innerHTML='<article class="tw card"><span class="tw-badge">'+x(T.win)+'</span><img src="'+x(w.img)+'" alt="" loading="lazy"><div class="tw-b"><h3>'+x(((t.names&&t.names[L]&&t.names[L][t.wi])||w.title).slice(0,90))+'</h3><div class="tw-m"><b>$'+x(w.price)+'</b><span>⭐ '+x(w.rating||'—')+'</span><span>🛒 '+x(w.sold)+' '+x(T.sold)+'</span></div><a class="go buy" href="'+x(w.link)+'" target="_blank" rel="sponsored nofollow noopener">'+x(T.buy)+'</a></div></article>'
 +'<div class="tl"><div class="tpost">'+lines.slice(0,6).map(function(l){return '<p>'+x(l)+'</p>'}).join('')+'</div>'
 +'<div class="tmini">'+others.map(function(p){return '<div class="card"><img src="'+x(p.img)+'" alt="" loading="lazy"><span>$'+x(p.price)+' · ⭐ '+x(p.rating||'—')+'</span></div>'}).join('')+'</div>'
 +'<a class="btn btn-ghost tmore" href="/'+L+'/deals/#'+x(t.niche)+'">'+x(T.more)+' →</a></div>';

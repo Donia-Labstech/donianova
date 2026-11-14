@@ -53,12 +53,14 @@ async function writePost(niche, top) {
     'then: "🏆 اختيارنا: <winner short name> — <reason with numbers>" (the winner is given; do not change it).',
     'then: "👇 <one action sentence>"',
     'Max 120 words. No links, no hashtags.',
-    'Output JSON only: {"post":"...","hashtags":["3 short Arabic hashtags for this category, without #"]}'
+    'ALSO write the same post in English ("post_en") and in French ("post_fr", vous-form), same format and same numbers: product lines start with 1️⃣ 2️⃣ 3️⃣, use "was $x" / "au lieu de $x", "sold" / "vendus", "🏆 Our pick:" / "🏆 Notre choix :", and a translated action line. Do not translate brand names or model numbers.',
+    'Also give a short clean product name (max 6 words, keep brand + key spec) for each product in the 3 languages.',
+    'Output JSON only: {"post":"...","post_en":"...","post_fr":"...","names":{"ar":["..."],"en":["..."],"fr":["..."]},"hashtags":["3 short Arabic hashtags for this category, without #"]}'
   ].join('\n');
   const r = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env.DEEPSEEK_API_KEY },
-    body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.35, max_tokens: 520, response_format: { type: 'json_object' }, messages: [
+    body: JSON.stringify({ model: 'deepseek-chat', temperature: 0.35, max_tokens: 1500, response_format: { type: 'json_object' }, messages: [
       { role: 'system', content: sys },
       { role: 'user', content: `Category: ${NAMES.ar[niche] || niche}\n${lines}\nFacts: ${tags}` } ] })
   });
@@ -71,12 +73,22 @@ async function writePost(niche, top) {
   const hashtags = [...new Set(list.map(h => String(h).replace(/^#/, '').trim()).filter(Boolean))].slice(0, 3)
     .map(h => '#' + String(h).replace(/^#/, '').trim().replace(/\s+/g, '_')).filter(h => h.length > 2);
   const wf = F[wi];
-  const wname = top[wi].title.replace(/[|،,(（].*$/, '').split(/\s+/).slice(0, 5).join(' ');
-  const hook = `🏆 اختيار اليوم في ${NAMES.ar[niche] || ''}: ${wname} — $${wf.price}` +
-    (wf.off ? ` (وفّر ${wf.off}%)` : '') + (wf.rating ? ` · ⭐${wf.rating}%` : '') + (wf.sold ? ` · 🛒${wf.sold} مبيع` : '');
-  const body = String(out.post || '').trim().split('\n');
-  if (body.length && !/^\s*1️⃣/.test(body[0])) body.shift();   // drop the model's own hook line
-  return { post: [hook].concat(body).join('\n'), winner: top[wi], hashtags, usage: j.usage };
+  const N = out.names && typeof out.names === 'object' ? out.names : {};
+  const fallback = top[wi].title.replace(/[|،,(（].*$/, '').split(/\s+/).slice(0, 5).join(' ');
+  const nm = L => (Array.isArray(N[L]) && N[L][wi]) ? String(N[L][wi]).slice(0, 60) : fallback;
+  const cat = { ar: NAMES.ar[niche] || '', en: (NAMES.en || {})[niche] || niche, fr: (NAMES.fr || {})[niche] || (NAMES.en || {})[niche] || niche };
+  const hookFor = L => {
+    const w = { ar: ['🏆 اختيار اليوم في ', 'وفّر', 'مبيع'], en: ["🏆 Today's pick in ", 'save', 'sold'], fr: ['🏆 Le choix du jour en ', 'économisez', 'vendus'] }[L];
+    return `${w[0]}${cat[L]}${L === "fr" ? " :" : ":"} ${nm(L)} — $${wf.price}` + (wf.off ? ` (${w[1]} ${wf.off}%)` : '') + (wf.rating ? ` · ⭐${wf.rating}%` : '') + (wf.sold ? ` · 🛒${wf.sold} ${w[2]}` : '');
+  };
+  const bodyOf = txt => { const b = String(txt || '').trim().split('\n').filter(l => l.trim()); if (b.length && !/^\s*1️⃣/.test(b[0])) b.shift(); return b; };
+  const hook = hookFor('ar');
+  const body = bodyOf(out.post);
+  const posts = { ar: [hook].concat(body).join('\n') };
+  for (const L of ['en', 'fr']) { const b = bodyOf(out['post_' + L]); posts[L] = b.length ? [hookFor(L)].concat(b).join('\n') : ''; }
+  const verdict = L => (posts[L].split('\n').find(l => l.startsWith('🏆') && l !== hookFor(L)) || '');
+  const names = { ar: N.ar, en: N.en, fr: N.fr };
+  return { post: posts.ar, posts, names, wi, hooks: { fr: hookFor('fr'), en: hookFor('en') }, verdicts: { fr: verdict('fr'), en: verdict('en') }, winner: top[wi], hashtags, usage: j.usage };
 }
 
 async function postToFacebook(message, link) {
@@ -93,15 +105,18 @@ async function buildToday(forced) {
   const items = await products.nicheItems(niche, 'ar');
   const top = items.filter(p => p.link).sort((a, b) => score(b) - score(a)).slice(0, 3);
   if (top.length < 2) return { niche, skipped: 'not_enough_items' };
-  const { post, winner, hashtags, usage } = await writePost(niche, top);
+  const { post, posts, names, wi, hooks, verdicts, winner, hashtags, usage } = await writePost(niche, top);
   // Facebook needs a short link: ask AliExpress for one, else fall back to our own category page.
   const short = await require('./_ali.js').shortLink(winner.id);
   winner.link = short || `${SITE}/ar/deals/#${niche}`;
   const message = post +
     `\n\n🛒 اطلبه الآن بأفضل سعر:\n${winner.link}` +
     `\n\n🔎 قارن كل عروض ${NAMES.ar[niche] || ''}:\n${SITE}/ar/deals/#${niche}` +
+    // short French + English summary so the same post serves all three audiences
+    (posts.fr ? `\n\n🇫🇷 ${hooks.fr}` + (verdicts.fr ? `\n${verdicts.fr}` : '') + `\n👉 ${SITE}/fr/deals/#${niche}` : '') +
+    (posts.en ? `\n\n🇬🇧 ${hooks.en}` + (verdicts.en ? `\n${verdicts.en}` : '') + `\n👉 ${SITE}/en/deals/#${niche}` : '') +
     '\n\n' + [...hashtags, '#عروض_اليوم', '#تخفيضات', '#علي_إكسبريس', '#DoniaNova', '#رابط_شراكة'].join(' ');
-  return { niche, post, message, winner, top, tokens: usage && usage.total_tokens };
+  return { niche, post, posts, names, wi, message, winner, top, tokens: usage && usage.total_tokens };
 }
 
 module.exports = async (req, res) => {
