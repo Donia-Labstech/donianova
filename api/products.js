@@ -74,7 +74,7 @@ const RULES = {
   qrscan:   { min: 12, keep: /scanner|reader|ماسح|قارئ/i, drop: /\bwired\b|stand only|holder only|cradle only/i },
   ringscan: { min: 15, keep: /ring|finger|wearable|خاتم|إصبع|اصبع/i },
   wmouse:   { min: 4, drop: /pad\b|mat\b|mouse ?pad|\bwired\b|لوحة ماوس|(?<!لا)سلكي/i },
-  wcombo:   { min: 10, drop: WIRED },
+  wcombo:   { min: 10, keep: /mouse|combo|ماوس|فأرة|فارة|مجموعة/i, drop: /keycaps?|key ?cap|أغطية مفاتيح|\bwired\b|(?<!لا)سلكي/i },
   wcharge:  { min: 8, keep: /wireless|magnetic|magsafe|qi|لاسلكي|مغناطيس/i, drop: /case|cable only|غطاء|حافظة/i },
   btspeaker:{ min: 8, drop: /case|bag|cable|حقيبة|غطاء/i },
   headphone:{ min: 10, drop: /ear ?pads?|cushion|case|stand|وسادة|حامل|غطاء/i },
