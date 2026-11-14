@@ -100,3 +100,25 @@
   function all(){document.querySelectorAll(SEL).forEach(prep);}
   all(); if('MutationObserver' in window){new MutationObserver(function(){all()}).observe(document.body,{childList:true,subtree:true});}
 })();
+
+(function(){
+  var tb=document.getElementById('topbar'),mega=document.getElementById('mega'),mb=document.querySelector('.mg-btn'),dd=document.querySelector('.tgdd'),tp=dd&&dd.querySelector('.tg-pill'),tm=dd&&dd.querySelector('.tgmenu');
+  var veil=document.createElement('div');veil.className='veil';veil.hidden=true;document.body.appendChild(veil);
+  function onS(){if(tb)tb.classList.toggle('stuck',scrollY>40)}onS();addEventListener('scroll',onS,{passive:true});
+  function closeAll(){if(mega){mega.hidden=true;if(mb)mb.setAttribute('aria-expanded','false');}if(tm){tm.hidden=true;tp.setAttribute('aria-expanded','false');}document.body.classList.remove('sheet-mega','sheet-tg');veil.hidden=true;}
+  function openMega(sheet){var o=mega.hidden;closeAll();if(!o)return;mega.hidden=false;if(mb)mb.setAttribute('aria-expanded','true');if(sheet){document.body.classList.add('sheet-mega');veil.hidden=false;}if(tb)tb.classList.add('stuck');}
+  function openTg(sheet){var o=tm.hidden;closeAll();if(!o)return;tm.hidden=false;tp.setAttribute('aria-expanded','true');if(sheet){document.body.classList.add('sheet-tg');veil.hidden=false;}}
+  if(mb&&mega)mb.addEventListener('click',function(ev){ev.stopPropagation();openMega(false)});
+  if(tp&&tm)tp.addEventListener('click',function(ev){ev.stopPropagation();openTg(false)});
+  document.addEventListener('click',function(ev){if(ev.target.closest('.mega .mg-grid,.tgmenu,.bbar'))return;if((mega&&!mega.hidden)||(tm&&!tm.hidden))closeAll();});
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')closeAll()});
+  if(mega)mega.addEventListener('click',function(ev){if(ev.target.closest('a'))closeAll()});
+  var bs=document.querySelector('.bb-sec'),bn=document.querySelector('.bb-nova'),bt=document.querySelector('.bb-tg');
+  if(bs)bs.addEventListener('click',function(ev){ev.stopPropagation();openMega(true)});
+  if(bt)bt.addEventListener('click',function(ev){ev.stopPropagation();openTg(true)});
+  if(bn)bn.addEventListener('click',function(){closeAll();var f=document.querySelector('.nova-fab');if(f)f.click()});
+  veil.addEventListener('click',closeAll);
+  document.querySelectorAll('.backbtn').forEach(function(b){b.addEventListener('click',function(){
+    var same=document.referrer&&document.referrer.indexOf(location.origin)===0;
+    if(same&&history.length>1)history.back();else location.href=b.dataset.home;});});
+})();

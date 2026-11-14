@@ -63,9 +63,18 @@
     if(innerWidth<760)h.scrollIntoView({behavior:'smooth',block:'start'});}
   if(sform){sform.addEventListener('submit',function(ev){ev.preventDefault();qi.blur();search(qi.value);});
     qi.addEventListener('input',function(){suggest(qi.value)});
-    sugg.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;sugg.innerHTML='';qi.value='';load(b.dataset.n);try{history.replaceState(null,'',location.pathname+'#'+b.dataset.n)}catch(e){}});}
+    sugg.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;sugg.innerHTML='';qi.value='';nav(b.dataset.n);});}
+  var wr=document.getElementById('worlds');
+  function setWorld(wi){if(!wr)return;wr.querySelectorAll('.wbtn').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.w===String(wi))});
+    tabs.querySelectorAll('.tgroup').forEach(function(g){g.hidden=g.dataset.w!==String(wi)});
+    var a=wr.querySelector('.wbtn[data-w="'+wi+'"]');if(a&&a.scrollIntoView)try{a.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})}catch(e){}}
+  function nav(n){try{if(location.hash.slice(1)!==n)history.pushState({n:n},'',location.pathname+'#'+n)}catch(e){}load(n);}
+  if(wr)wr.addEventListener('click',function(ev){var b=ev.target.closest('.wbtn');if(!b)return;var g=tabs.querySelector('.tgroup[data-w="'+b.dataset.w+'"] button');if(g)nav(g.dataset.n);});
+  addEventListener('popstate',function(){var n=(location.hash||'').slice(1);if(n&&tabs.querySelector('button[data-n="'+n+'"]'))load(n);});
+  addEventListener('hashchange',function(){var n=(location.hash||'').slice(1);if(n&&tabs.querySelector('button[data-n="'+n+'"]'))load(n);});
   function load(n){
     hero(n);
+    var tb=tabs.querySelector('button[data-n="'+n+'"]');if(tb)setWorld(tb.parentNode.dataset.w);
     tabs.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.n===n)});
     if(cache[n]){render(cache[n]);return;}
     skel();
@@ -73,7 +82,7 @@
       if(j.error)throw j; cache[n]=j; render(j);
     }).catch(function(){grid.innerHTML='';st.innerHTML=esc(C.fail)+' <a href="'+C.home+'">DoniaNova</a>';});
   }
-  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;load(b.dataset.n);try{history.replaceState(null,'',location.pathname+'#'+b.dataset.n)}catch(e){}
+  tabs.addEventListener('click',function(ev){var b=ev.target.closest('button[data-n]');if(!b)return;nav(b.dataset.n);
     if(innerWidth<760)st.scrollIntoView({behavior:'smooth',block:'start'});});
   var h=(location.hash||'').slice(1), sp=null;try{sp=new URLSearchParams(location.search)}catch(e){}
   var q0=sp&&sp.get('q');
