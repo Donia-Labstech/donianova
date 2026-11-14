@@ -17,7 +17,7 @@ async function api(method, body) {
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 // Featured sections shown as buttons
-const MENU = ['barcode', 'ssd', 'projector', 'translator', 'powerbank', 'audio', 'board', 'monitor', 'charger', 'actioncam', 'microsd', 'travel'];
+const MENU = ['qrscan', 'wcharge', 'headphone', 'barcode', 'ssd', 'projector', 'translator', 'powerbank', 'audio', 'board', 'charger', 'actioncam', 'travel'];
 function menuKeyboard() {
   const rows = [];
   for (let i = 0; i < MENU.length; i += 2) rows.push(MENU.slice(i, i + 2).map(k => ({ text: NAMES.ar[k] || k, callback_data: 'cat:' + k })));

@@ -49,7 +49,19 @@ const NICHES = {
   // travel
   travel:    'universal travel adapter',
   luggage:   'digital luggage scale',
-  organizer: 'electronics organizer travel bag'
+  organizer: 'electronics organizer travel bag',
+  // wireless world
+  qrscan:    'wireless QR code scanner bluetooth 2D handheld',
+  ringscan:  'wearable ring barcode scanner bluetooth',
+  wmouse:    'wireless mouse rechargeable silent bluetooth',
+  wcombo:    'wireless keyboard mouse combo',
+  wcharge:   '3 in 1 magnetic wireless charger stand',
+  btspeaker: 'portable bluetooth speaker waterproof',
+  headphone: 'wireless bluetooth headphones noise cancelling over ear',
+  btreceiver:'bluetooth 5.3 audio receiver transmitter',
+  carplay:   'wireless carplay android auto adapter',
+  wifi:      'USB WiFi adapter dual band 5GHz',
+  extender:  'WiFi range extender repeater'
 };
 
 // Never list spy / covert-surveillance gear (illegal in many countries, against our values)
@@ -57,7 +69,19 @@ const BANNED = /\bspy\b|hidden (camera|recorder)|covert|eavesdrop|wiretap|bug de
 
 // Per-niche guards: drop accessories that match the keywords but are not the product itself
 const ACCESSORY = /enclosure|case|adapter|caddy|حافظة|علبة|الضميمة|محول|صندوق|غلاف|حاوية/i;
+const WIRED = /\bwired\b|(?<!لا)سلكي/i;
 const RULES = {
+  qrscan:   { min: 12, keep: /scanner|reader|ماسح|قارئ/i, drop: /\bwired\b|stand only|holder only|cradle only/i },
+  ringscan: { min: 15, keep: /ring|finger|wearable|خاتم|إصبع|اصبع/i },
+  wmouse:   { min: 4, drop: /pad\b|mat\b|mouse ?pad|\bwired\b|لوحة ماوس|(?<!لا)سلكي/i },
+  wcombo:   { min: 10, drop: WIRED },
+  wcharge:  { min: 8, keep: /wireless|magnetic|magsafe|qi|لاسلكي|مغناطيس/i, drop: /case|cable only|غطاء|حافظة/i },
+  btspeaker:{ min: 8, drop: /case|bag|cable|حقيبة|غطاء/i },
+  headphone:{ min: 10, drop: /ear ?pads?|cushion|case|stand|وسادة|حامل|غطاء/i },
+  btreceiver:{ min: 3 },
+  carplay:  { min: 15, drop: /cable only|holder|حامل/i },
+  wifi:     { min: 3, keep: /wi-?fi|wireless|لاسلكي|واي ?فاي/i },
+  extender: { min: 6, keep: /extender|repeater|booster|موسع|مكرر|مقوي/i },
   ssd:      { min: 20, drop: ACCESSORY },
   hdd:      { min: 20, drop: ACCESSORY },
   flash:    { min: 3 },
