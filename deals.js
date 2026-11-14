@@ -9,7 +9,7 @@
     var items=(data&&data.items)||[];
     if(!items.length){grid.innerHTML='';st.innerHTML=esc(C.empty);return;}
     var t=new Date(data.updated);
-    st.textContent=C.updated+': '+t.toLocaleString(C.lang==='ar'?'ar':'en',{dateStyle:'medium',timeStyle:'short'});
+    st.textContent=C.updated+': '+t.toLocaleString(C.lang==='ar'?'ar':C.lang==='fr'?'fr-FR':'en',{dateStyle:'medium',timeStyle:'short'});
     var B=C.B||{};
     grid.innerHTML=items.map(function(p,i){
       var d=parseInt(String(p.discount||'0').replace(/[^0-9]/g,''))||0, r=parseFloat(String(p.rating||'0'))||0, sold=+p.sold||0;

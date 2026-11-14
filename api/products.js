@@ -127,7 +127,22 @@ async function toKeywords(q) {
   } catch (e) { return q; }
 }
 
+// French: filter on English titles (rules are EN/AR), then swap in French titles by product id
+async function frOverlay(items, kw, lang) {
+  if (lang !== 'fr' || !items.length) return items;
+  try {
+    const fr = await ali.search(kw, { lang: 'fr', size: 50 });
+    const m = {}; fr.forEach(p => { m[p.id] = p.title; });
+    return items.map(p => m[p.id] ? Object.assign({}, p, { title: m[p.id] }) : p);
+  } catch (e) { return items; }
+}
+
 async function nicheItems(niche, lang, trace) {
+  const items = await nicheItemsEn(niche, lang === 'ar' ? 'ar' : 'en', trace);
+  return frOverlay(items, NICHES[niche], lang);
+}
+
+async function nicheItemsEn(niche, lang, trace) {
   const rule = RULES[niche] || {};
   return (await ali.search(NICHES[niche], { lang, size: 50, trace }))
     .filter(p => !BANNED.test(p.title))
@@ -146,13 +161,13 @@ module.exports = async (req, res) => {
   const q = req.query || {};
   const text = String(q.q || '').replace(/[<>"'`]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
   if (text.length >= 2) {
-    const lang = q.lang === 'ar' ? 'ar' : 'en';
+    const lang = q.lang === 'ar' || q.lang === 'fr' ? q.lang : 'en';
     try {
       const kw = await toKeywords(text);
-      const items = (await ali.search(kw, { lang, size: 50 }))
+      const items = await frOverlay((await ali.search(kw, { lang: lang === 'ar' ? 'ar' : 'en', size: 50 }))
         .filter(p => !BANNED.test(p.title))
         .filter(p => { const r = parseFloat(p.rating); return !(r > 0 && r < 85); })
-        .slice(0, 24);
+        .slice(0, 24), kw, lang);
       res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
       return res.status(200).json({ q: text, kw, lang, updated: new Date().toISOString(), items });
     } catch (e) {
@@ -160,7 +175,7 @@ module.exports = async (req, res) => {
     }
   }
   const niche = NICHES[q.niche] ? q.niche : 'audio';
-  const lang = q.lang === 'ar' ? 'ar' : 'en';
+  const lang = q.lang === 'ar' || q.lang === 'fr' ? q.lang : 'en';
   const trace = q.debug ? [] : null;
   try {
     const items = await nicheItems(niche, lang, trace);

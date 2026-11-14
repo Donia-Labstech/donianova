@@ -73,7 +73,7 @@ async function search(keywords, opts) {
     page_size: String(opts.size || 20),
     sort: opts.sort || 'LAST_VOLUME_DESC',
     target_currency: 'USD',
-    target_language: opts.lang === 'ar' ? 'AR' : 'EN',
+    target_language: opts.lang === 'ar' ? 'AR' : opts.lang === 'fr' ? 'FR' : 'EN',
     tracking_id: process.env.ALIEXPRESS_TRACKING_ID || 'default'
   };
   const j = await call('aliexpress.affiliate.product.query', extra, opts.trace);

@@ -553,3 +553,6 @@ body.sheet-mega .topbar,body.sheet-tg .topbar{backdrop-filter:none!important;-we
  .wgrid{gap:12px}.wt{padding:16px 14px;min-height:0}.wt b{font-size:16px}.wt-ic{width:46px;height:46px;font-size:24px}
 }
 @media (max-width:420px){.wgrid{grid-template-columns:1fr 1fr}.wt small{display:none}}
+
+@media (max-width:560px){.lang a{padding:4px 7px;font-size:12px}.lang{gap:0;padding:2px}.tright{gap:6px}}
+@media (max-width:380px){.lang a{padding:4px 6px}}

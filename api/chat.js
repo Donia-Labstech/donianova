@@ -11,10 +11,13 @@ function limited(ip) {
 }
 
 function system(lang) {
-  const list = CATALOG.map(p => `- ${p[lang].name} | ${lang === 'ar' ? 'الأنسب لـ' : 'best for'}: ${p[lang].best} | ${lang === 'ar' ? 'ملاحظات' : 'notes'}: ${p[lang].why} | page: /${lang}/p/${p.slug}/`).join('\n');
+  const cl = lang === 'ar' ? 'ar' : 'en';
+  const list = CATALOG.map(p => `- ${p[cl].name} | ${lang === 'ar' ? 'الأنسب لـ' : 'best for'}: ${p[cl].best} | ${lang === 'ar' ? 'ملاحظات' : 'notes'}: ${p[cl].why} | page: /${lang}/p/${p.slug}/`).join('\n');
   return [
     lang === 'ar'
       ? 'أنت «نوفا»، المساعد الذكي لموقع DoniaNova الذي يوصي بأجهزة تقنية من علي إكسبريس. أجب بالعربية الفصحى المبسّطة دائماً، إلا إذا كتب الزائر بلغة أخرى فأجب بلغته.'
+      : lang === 'fr'
+      ? 'Tu es « Nova », l\'assistant shopping de DoniaNova, un site qui recommande du matériel tech d\'AliExpress. Réponds toujours en français (vouvoiement), sauf si le visiteur écrit dans une autre langue. The catalog below is in English: translate product names and notes into French in your answers.'
       : 'You are "Nova", the shopping assistant of DoniaNova, a site that recommends tech gear from AliExpress. Reply in English unless the visitor writes in another language.',
     'Rules:',
     '1. First check the reviewed catalog below. Link catalog products with their page path exactly as given (e.g. /' + lang + '/p/slug/).',
@@ -39,7 +42,7 @@ module.exports = async (req, res) => {
 
   let body = req.body;
   if (typeof body === 'string') { try { body = JSON.parse(body); } catch (e) { body = {}; } }
-  const lang = body && body.lang === 'en' ? 'en' : 'ar';
+  const lang = body && (body.lang === 'en' || body.lang === 'fr') ? body.lang : 'ar';
   const msgs = Array.isArray(body && body.messages) ? body.messages : [];
   const clean = msgs.slice(-8)
     .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')

@@ -34,8 +34,9 @@
 })();
 
 (function(){
-  var ar=(document.documentElement.lang||'ar')==='ar';
-  var T=ar?{fab:'اسأل نوفا',title:'نوفا، مساعدك الذكي',sub:'يبحث، يقارن ويقترح لك الأنسب',hi:'أهلاً 👋 أنا نوفا. أبحث لك في علي إكسبريس وأقارن بين المنتجات بأسعارها الحالية: قارئ باركود، أقراص صلبة، لواحق الهاتف، أدوات التعليم والسفر… أخبرني ماذا تحتاج وميزانيتك.',ph:'اكتب سؤالك…',send:'إرسال',chips:['قارن لي بين أفضل أقراص SSD المحمولة','قارئ باركود لاسلكي لمحل صغير','سماعة جيدة للحصص عن بعد','شاحن سريع وبطارية للسفر'],err:'تعذّر الرد الآن. جرّب بعد قليل.',rate:'وصلت إلى الحد المؤقت للأسئلة، جرّب بعد دقائق.',fine:'قد يخطئ المساعد. السعر النهائي على علي إكسبريس.'}
+  var LG=document.documentElement.lang||'ar',ar=LG==='ar';
+  var NOVA_FR={fab:'Demander à Nova',title:'Nova, votre assistant intelligent',sub:'Il cherche, compare et vous conseille',hi:'Bonjour 👋 Je suis Nova. Je cherche sur AliExpress et compare les produits à leur prix actuel : lecteurs de codes-barres, disques, accessoires de téléphone, matériel pour enseigner et voyager… Dites-moi ce dont vous avez besoin et votre budget.',ph:'Écrivez votre question…',send:'Envoyer',chips:['Compare les meilleurs SSD portables','Lecteur de codes-barres sans fil pour une petite boutique','De bons écouteurs pour les cours en ligne','Chargeur rapide et batterie externe pour voyager'],err:'Pas de réponse pour le moment. Réessayez dans un instant.',rate:'Limite de questions atteinte pour le moment. Réessayez dans quelques minutes.',fine:"L'assistant peut se tromper. Le prix final est sur AliExpress."};
+  var T=LG==='fr'?NOVA_FR:ar?{fab:'اسأل نوفا',title:'نوفا، مساعدك الذكي',sub:'يبحث، يقارن ويقترح لك الأنسب',hi:'أهلاً 👋 أنا نوفا. أبحث لك في علي إكسبريس وأقارن بين المنتجات بأسعارها الحالية: قارئ باركود، أقراص صلبة، لواحق الهاتف، أدوات التعليم والسفر… أخبرني ماذا تحتاج وميزانيتك.',ph:'اكتب سؤالك…',send:'إرسال',chips:['قارن لي بين أفضل أقراص SSD المحمولة','قارئ باركود لاسلكي لمحل صغير','سماعة جيدة للحصص عن بعد','شاحن سريع وبطارية للسفر'],err:'تعذّر الرد الآن. جرّب بعد قليل.',rate:'وصلت إلى الحد المؤقت للأسئلة، جرّب بعد دقائق.',fine:'قد يخطئ المساعد. السعر النهائي على علي إكسبريس.'}
           :{fab:'Ask Nova',title:'Nova, your smart assistant',sub:'Searches, compares and suggests',hi:'Hi 👋 I am Nova. I search AliExpress and compare products at their current prices: barcode scanners, drives, phone accessories, teaching and travel gear… Tell me what you need and your budget.',ph:'Type your question…',send:'Send',chips:['Compare the best portable SSDs','Wireless barcode scanner for a small shop','Good earbuds for online classes','Fast charger and power bank for travel'],err:'No reply right now. Please try again shortly.',rate:'Question limit reached for now. Try again in a few minutes.',fine:'The assistant can make mistakes. Final price is on AliExpress.'};
   var hist=[];try{hist=JSON.parse(sessionStorage.getItem('nova')||'[]')}catch(e){}
   var star='<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 1 L19 13 L31 16 L19 19 L16 31 L13 19 L1 16 L13 13 Z" fill="#E6B95B"/></svg>';
@@ -44,7 +45,7 @@
   var box=null,log,inp,busy=false;
   function esc(s){return s.replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function inl(s){s=esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-    return s.replace(/(https?:\/\/[^\s)<]+|\/(?:ar|en)\/(?:p\/[a-z0-9-]+\/|deals\/))/g,function(u){var ext=u.indexOf('http')===0;return '<a href="'+u+'"'+(ext?' target="_blank" rel="sponsored nofollow noopener"':'')+'>'+(ext?(ar?'عرض المنتج ↗':'View product ↗'):(ar?'افتح الصفحة':'Open page'))+'</a>'});}
+    return s.replace(/(https?:\/\/[^\s)<]+|\/(?:ar|en|fr)\/(?:p\/[a-z0-9-]+\/|deals\/))/g,function(u){var ext=u.indexOf('http')===0;return '<a href="'+u+'"'+(ext?' target="_blank" rel="sponsored nofollow noopener"':'')+'>'+(ext?(ar?'عرض المنتج ↗':LG==='fr'?'Voir le produit ↗':'View product ↗'):(ar?'افتح الصفحة':LG==='fr'?'Ouvrir la page':'Open page'))+'</a>'});}
   function fmt(s){var L=s.split('\n'),o='',i=0;
     while(i<L.length){var l=L[i].trim();
       if(/^\|.*\|$/.test(l)){var rows=[];while(i<L.length&&/^\|.*\|$/.test(L[i].trim())){rows.push(L[i].trim());i++;}
@@ -58,7 +59,7 @@
   function save(){try{sessionStorage.setItem('nova',JSON.stringify(hist.slice(-12)))}catch(e){}}
   function send(q){q=(q||'').trim();if(!q||busy)return;busy=true;inp.value='';add('user',q);hist.push({role:'user',content:q});save();
     var t=add('assistant','…','typing');
-    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:ar?'ar':'en',messages:hist})})
+    fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:LG,messages:hist})})
       .then(function(r){return r.json().then(function(j){return{s:r.status,j:j}})})
       .then(function(x){t.remove();if(x.j.reply){add('assistant',x.j.reply);hist.push({role:'assistant',content:x.j.reply});save();}else add('assistant',x.s===429?T.rate:T.err);})
       .catch(function(){t.remove();add('assistant',T.err);}).then(function(){busy=false;inp.focus();});}
