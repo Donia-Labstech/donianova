@@ -1,6 +1,18 @@
 {
  "cleanUrls": false,
  "trailingSlash": true,
+ "redirects": [
+  {
+   "source": "/_src/:path*",
+   "destination": "/",
+   "permanent": false
+  },
+  {
+   "source": "/_build/:path*",
+   "destination": "/",
+   "permanent": false
+  }
+ ],
  "rewrites": [
   {
    "source": "/daily.xml",

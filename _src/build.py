@@ -1266,7 +1266,7 @@ def main():
     names["fr"] = {k: tr_text(v) for k, v in names["en"].items()}
     dump_missing()
     with open(os.path.join(OUT,"api","_names.js"),"w",encoding="utf-8") as f: f.write("module.exports = "+json.dumps(names,ensure_ascii=False)+";\n")
-    write("vercel.json", json.dumps({"cleanUrls": False, "trailingSlash": True,
+    write("vercel.json", json.dumps({"cleanUrls": False, "trailingSlash": True, "redirects": [{"source": "/_src/:path*", "destination": "/", "permanent": False}, {"source": "/_build/:path*", "destination": "/", "permanent": False}],
         "rewrites":[{"source":"/daily.xml","destination":"/api/feed"}],
         "crons":[{"path":"/api/telegram?daily=1","schedule":"30 7 * * *"},{"path":"/api/indexnow","schedule":"0 6 * * 1"}],
         "headers":[{"source":"/img/(.*)","headers":[{"key":"Cache-Control","value":"public, max-age=604800"}]}]}, indent=1))
