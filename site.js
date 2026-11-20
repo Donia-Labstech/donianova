@@ -273,3 +273,46 @@
   document.addEventListener('click',function(ev){var b=ev.target.closest('[data-imgs]');if(!b)return;ev.preventDefault();
     $('imgs-stage').hidden=true;$('imgs-q').value='';open(I);ready().catch(function(){});});
 })();
+
+/* ---------- promo engine ---------- */
+(function(){
+  var box=document.getElementById('promo'); if(!box)return;
+  var LG=document.documentElement.lang||'ar';
+  var tz=''; try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}
+  var GCC=/Riyadh|Dubai|Kuwait|Qatar|Bahrain|Muscat/, FR=/Europe\/Paris/,
+      GLOBAL=/Algiers|Casablanca|El_Aaiun|Cairo|Baghdad|Beirut|Tripoli|Khartoum|Nouakchott|Damascus|Aden|Mogadishu|Djibouti/;
+  var reg=GCC.test(tz)?'gcc':FR.test(tz)?'fr':GLOBAL.test(tz)?'global':(LG==='fr'?'fr':null);
+  fetch('/promos.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(P){
+    var now=Date.now(), c=(P.campaigns||[]).filter(function(c){return now>=Date.parse(c.start)&&now<=Date.parse(c.end)})[0];
+    if(!c)return;
+    var R=reg&&c.regions&&c.regions[reg], start=Date.parse((R&&R.start)||c.start), end=Date.parse((R&&R.end)||c.end);
+    if(R&&(now<start||now>end))R=null;
+    if(!R)end=Date.parse(c.end);
+    var name=(R&&R.name&&R.name[LG])||(c.name&&c.name[LG])||'', ben=(c.benefit&&c.benefit[LG])||'';
+    document.getElementById('pm-name').textContent=name;
+    document.getElementById('pm-ben').textContent=ben;
+    var dd=document.getElementById('pm-d').textContent, sv=document.getElementById('pm-save').textContent;
+    function pad(x){return (x<10?'0':'')+x}
+    function tick(){var t=Math.max(0,Math.floor((end-Date.now())/1000));if(!t){box.hidden=true;return;}
+      var D=Math.floor(t/86400),H=Math.floor(t%86400/3600),M=Math.floor(t%3600/60),S=t%60;
+      document.getElementById('pm-clock').innerHTML=(D?'<span><b>'+D+'</b><i>'+dd+'</i></span>':'')+'<span><b>'+pad(H)+'</b><i>:</i></span><span><b>'+pad(M)+'</b><i>:</i></span><span><b>'+pad(S)+'</b></span>';}
+    tick();setInterval(tick,1000);
+    if(R&&R.codes&&R.codes.length){
+      var list=document.getElementById('pm-list'),tpl=document.getElementById('pm-tpl'),cur=R.cur||'$';
+      function money(v){return cur==='$'||cur==='€'?cur+v:v+' '+cur}
+      R.codes.slice(0,6).forEach(function(k){
+        var n=tpl.content.firstElementChild.cloneNode(true);
+        n.querySelector('.pm-c').textContent=k[0];
+        n.querySelector('.pm-off').textContent=sv+' '+money(k[2]);
+        n.querySelector('.pm-min').textContent=money(k[1]);
+        n.addEventListener('click',function(){
+          var done=function(){n.classList.add('ok');setTimeout(function(){n.classList.remove('ok')},1600)};
+          if(navigator.clipboard)navigator.clipboard.writeText(k[0]).then(done,done);else done();
+        });
+        list.appendChild(n);
+      });
+      document.getElementById('pm-codes').hidden=false;
+    }
+    box.hidden=false;
+  }).catch(function(){});
+})();
