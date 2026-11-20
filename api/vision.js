@@ -30,10 +30,11 @@ module.exports = async (req, res) => {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: prompt }, { inline_data: { mime_type: m[1], data: m[2] } }] }],
-        generationConfig: { temperature: 0.2, maxOutputTokens: 300, responseMimeType: 'application/json' }
+        generationConfig: { temperature: 0.2, maxOutputTokens: 800, responseMimeType: 'application/json', thinkingConfig: { thinkingBudget: 0 } }
       })
     });
     const j = await r.json();
+    if (j.error) return res.status(502).json({ error: 'gemini', status: j.error.status || j.error.code, model: MODEL });
     const txt = (((j.candidates || [])[0] || {}).content || {}).parts ? j.candidates[0].content.parts.map(p => p.text || '').join('') : '';
     const out = JSON.parse((txt.match(/\{[\s\S]*\}/) || ['{}'])[0]);
     if (!out.ok || !out.q) return res.status(200).json({ ok: false });
