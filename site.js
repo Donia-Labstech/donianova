@@ -281,7 +281,8 @@
   var tz=''; try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}
   var GCC=/Riyadh|Dubai|Kuwait|Qatar|Bahrain|Muscat/, FR=/Europe\/Paris/,
       GLOBAL=/Algiers|Casablanca|El_Aaiun|Cairo|Baghdad|Beirut|Tripoli|Khartoum|Nouakchott|Damascus|Aden|Mogadishu|Djibouti/;
-  var reg=GCC.test(tz)?'gcc':FR.test(tz)?'fr':GLOBAL.test(tz)?'global':(LG==='fr'?'fr':null);
+  var OUT=/^(Europe|America|Australia|Pacific|Asia\/(Tokyo|Seoul|Jerusalem|Tel_Aviv|Tunis|Amman|Karachi|Kolkata|Calcutta|Dhaka|Manila|Bangkok|Singapore|Kuala_Lumpur|Ho_Chi_Minh|Hong_Kong|Taipei|Kathmandu|Colombo)|Africa\/(Tunis|Dakar|Abidjan|Kampala|Kigali|Lusaka|Maputo|Luanda|Dar_es_Salaam))/;
+  var reg=GCC.test(tz)?'gcc':FR.test(tz)?'fr':GLOBAL.test(tz)?'global':OUT.test(tz)?(LG==='fr'?'fr':null):'global';
   fetch('/promos.json',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(P){
     var now=Date.now(), c=(P.campaigns||[]).filter(function(c){return now>=Date.parse(c.start)&&now<=Date.parse(c.end)})[0];
     if(!c)return;
