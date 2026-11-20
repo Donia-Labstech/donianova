@@ -123,3 +123,153 @@
     var same=document.referrer&&document.referrer.indexOf(location.origin)===0;
     if(same&&history.length>1)history.back();else location.href=b.dataset.home;});});
 })();
+
+/* ---------- v10: welcome, most wanted, image search ---------- */
+(function(){
+  var LG=document.documentElement.lang||'ar';
+  function $(id){return document.getElementById(id)}
+  function open(o){if(!o)return;o.hidden=false;document.body.classList.add('ovl-on');requestAnimationFrame(function(){o.classList.add('in')});}
+  function close(o){if(!o)return;o.classList.remove('in');document.body.classList.remove('ovl-on');setTimeout(function(){o.hidden=true},220);}
+  document.querySelectorAll('.ovl').forEach(function(o){
+    o.addEventListener('click',function(ev){if(ev.target===o||ev.target.closest('[data-close]'))close(o)});
+  });
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')document.querySelectorAll('.ovl.in').forEach(close)});
+
+  /* welcome: once per browser */
+  var W=$('welcome');
+  try{ if(W && !localStorage.getItem('dn-wel') && !/[?&]q=/.test(location.search)){ setTimeout(function(){open(W)},1400); localStorage.setItem('dn-wel','1'); } }catch(e){}
+
+  /* most wanted */
+  var grid=$('hotGrid'), tpl=$('hotTpl'), data=[];
+  function fmt(n){n=+n||0;return n>=1000?(n/1000).toFixed(n>=10000?0:1).replace('.0','')+'k':String(n)}
+  function draw(by){
+    var items=data.slice();
+    if(by==='rate')items.sort(function(a,b){return (parseFloat(b.rating)||0)-(parseFloat(a.rating)||0)||(+b.sold-+a.sold)});
+    else if(by==='price')items.sort(function(a,b){return (+a.price)-(+b.price)});
+    else items.sort(function(a,b){return (+b.sold)-(+a.sold)});
+    var maxSold=Math.max.apply(null,data.map(function(p){return +p.sold||0}));
+    var maxRate=Math.max.apply(null,data.map(function(p){return parseFloat(p.rating)||0}));
+    grid.innerHTML='';
+    items.slice(0,12).forEach(function(p,i){
+      var n=tpl.content.firstElementChild.cloneNode(true), r=parseFloat(p.rating)||0;
+      n.querySelector('.hot-rank').textContent='#'+(i+1);
+      n.querySelectorAll('a').forEach(function(a){a.href=p.link});
+      n.querySelector('img').src=p.img;
+      n.querySelector('h3').textContent=p.title;
+      n.querySelector('.priceRow b').textContent='$'+p.price;
+      var s=n.querySelector('.priceRow s'); if(p.orig&&+p.orig>+p.price*1.05&&+p.orig<+p.price*2.5)s.textContent='$'+p.orig; else s.remove();
+      n.querySelector('.m-sold').textContent=fmt(p.sold);
+      n.querySelector('.m-rate').textContent=r?r.toFixed(1).replace('.0','')+'%':'—';
+      var keep=(+p.sold===maxSold||+p.sold>=5000)?'best':(r>=maxRate-0.2&&r>=97?'top':'hot');
+      n.querySelectorAll('[data-b]').forEach(function(b){if(b.getAttribute('data-b')!==keep)b.remove()});
+      n.style.animationDelay=(i*35)+'ms';
+      grid.appendChild(n);
+    });
+  }
+  if(grid&&tpl){
+    fetch('/api/trending/?lang='+LG).then(function(r){return r.json()}).then(function(j){
+      data=(j&&j.items)||[]; if(!data.length)throw 0; draw('sold');
+    }).catch(function(){var s=$('hot');if(s)s.hidden=true;});
+    var sb=$('hotSort');
+    if(sb)sb.addEventListener('click',function(ev){var b=ev.target.closest('button');if(!b||!data.length)return;
+      sb.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});draw(b.getAttribute('data-s'));});
+  }
+
+  /* image search (on-device MobileNet, nothing is uploaded) */
+  var I=$('imgs'); if(!I)return;
+  var MODEL='https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.50_224/model.json';
+  var TF='https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js';
+  var M={ /* ImageNet label -> [search keywords, Arabic, French] */
+    'cellular telephone':['smartphone','هاتف ذكي','smartphone'],'iPod':['wireless earbuds','سماعات لاسلكية','écouteurs sans fil'],
+    'computer keyboard':['wireless keyboard','لوحة مفاتيح','clavier sans fil'],'typewriter keyboard':['mechanical keyboard','لوحة مفاتيح ميكانيكية','clavier mécanique'],
+    'space bar':['wireless keyboard','لوحة مفاتيح','clavier sans fil'],'mouse':['wireless mouse','فأرة لاسلكية','souris sans fil'],
+    'laptop':['laptop stand','حامل لابتوب','support ordinateur portable'],'notebook':['laptop stand','حامل لابتوب','support ordinateur portable'],
+    'monitor':['portable monitor','شاشة محمولة','écran portable'],'screen':['portable monitor','شاشة','écran'],'desktop computer':['mini PC','حاسوب مكتبي صغير','mini PC'],
+    'television':['smart TV box','جهاز تلفاز ذكي','box TV'],'remote control':['remote control','جهاز تحكم','télécommande'],
+    'joystick':['game controller','يد تحكم','manette de jeu'],'loudspeaker':['bluetooth speaker','مكبر صوت','enceinte bluetooth'],
+    'microphone':['wireless microphone','ميكروفون','micro sans fil'],'digital watch':['smart watch','ساعة ذكية','montre connectée'],
+    'analog clock':['smart watch','ساعة','montre'],'stopwatch':['smart watch','ساعة','montre'],'reflex camera':['action camera','كاميرا','caméra'],
+    'Polaroid camera':['instant camera','كاميرا فورية','appareil photo instantané'],'projector':['mini projector','بروجكتور داتاشو','vidéoprojecteur'],
+    'printer':['thermal printer','طابعة','imprimante'],'hard disc':['portable SSD','قرص صلب','disque dur'],'modem':['wifi router','راوتر واي فاي','routeur wifi'],
+    'electric fan':['portable fan','مروحة','ventilateur'],'hair drier':['hair dryer','مجفف شعر','sèche-cheveux'],'vacuum':['cordless vacuum cleaner','مكنسة كهربائية','aspirateur sans fil'],
+    'iron':['steam iron','مكواة','fer à repasser'],'sunglasses':['sunglasses','نظارات شمسية','lunettes de soleil'],'backpack':['laptop backpack','حقيبة ظهر','sac à dos'],
+    'wallet':['RFID wallet','محفظة','portefeuille'],'purse':['wallet','محفظة','porte-monnaie'],'running shoe':['running shoes','حذاء رياضي','chaussures de course'],
+    'binoculars':['monocular telescope','منظار','monoculaire'],'flashlight':['LED flashlight','مصباح يدوي','lampe torche'],'torch':['LED flashlight','مصباح يدوي','lampe torche'],
+    'table lamp':['LED desk lamp','مصباح مكتب','lampe de bureau'],'lampshade':['LED lamp','مصباح','lampe'],'spotlight':['LED light','إضاءة LED','lumière LED'],
+    'power drill':['cordless drill','مثقاب','perceuse sans fil'],'screwdriver':['electric screwdriver set','مفك براغي','tournevis'],
+    'scale':['digital scale','ميزان رقمي','balance numérique'],'water bottle':['smart water bottle','قارورة ماء','gourde'],'vacuum flask':['thermos bottle','ترمس','thermos'],
+    'coffeemaker':['coffee maker','آلة قهوة','cafetière'],'espresso maker':['portable espresso maker','آلة إسبريسو','machine espresso'],
+    'car mirror':['dash cam','كاميرا السيارة','dashcam'],'sports car':['car accessories','إكسسوارات السيارة','accessoires voiture'],
+    'tripod':['phone tripod','حامل ثلاثي','trépied'],'lens cap':['camera lens','عدسة كاميرا','objectif'],'radio':['bluetooth radio speaker','راديو','radio'],
+    'CD player':['bluetooth receiver','جهاز صوت','récepteur bluetooth'],'cassette player':['bluetooth speaker','جهاز صوت','enceinte'],
+    'hand-held computer':['tablet','جهاز لوحي','tablette'],'web site':['tablet','شاشة','tablette'],'padlock':['smart lock','قفل ذكي','cadenas connecté'],
+    'combination lock':['smart lock','قفل ذكي','cadenas connecté'],'safe':['smart safe','خزنة','coffre-fort'],'ballpoint':['smart pen','قلم','stylo'],
+    'fountain pen':['pen','قلم','stylo'],'pencil box':['pencil case','مقلمة','trousse'],'umbrella':['umbrella','مظلة','parapluie'],'mailbag':['travel bag','حقيبة سفر','sac de voyage'],
+    'switch':['smart switch','مفتاح ذكي','interrupteur connecté'],'electric guitar':['guitar','غيتار','guitare'],'acoustic guitar':['guitar','غيتار','guitare'],
+    'toaster':['toaster','محمصة خبز','grille-pain'],'microwave':['microwave','ميكروويف','micro-ondes'],'mug':['smart mug','كوب','tasse'],
+    'refrigerator':['mini fridge','ثلاجة صغيرة','mini frigo'],'washer':['portable washing machine','غسالة','lave-linge'],'oscilloscope':['multimeter','جهاز قياس','multimètre'],
+    'barbell':['fitness equipment','أدوات رياضة','fitness'],'dumbbell':['dumbbell','دمبل','haltère'],'syringe':['','',''],'band aid':['','','']
+  };
+  var labels=null, model=null, loading=null;
+  function st(id){var s=$('imgs-s-'+id);$('imgs-st').textContent=s?s.textContent:'';}
+  function script(src){return new Promise(function(ok,ko){var s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s);})}
+  function ready(){
+    if(!loading)loading=(window.tf?Promise.resolve():script(TF)).then(function(){
+      return Promise.all([tf.loadLayersModel(MODEL),fetch('/img/labels.json').then(function(r){return r.json()})]);
+    }).then(function(r){model=r[0];labels=r[1];});
+    return loading;
+  }
+  function go(q){q=String(q||'').trim();if(q.length<2)return;location.href='/'+LG+'/deals/?q='+encodeURIComponent(q);}
+  function classify(img){
+    return tf.tidy(function(){
+      var t=tf.browser.fromPixels(img).resizeBilinear([224,224]).toFloat().div(127.5).sub(1).expandDims(0);
+      return model.predict(t).dataSync();
+    });
+  }
+  function chips(out){
+    var g=$('imgs-guess'); g.innerHTML='';
+    if(!out.length){st('fail');$('imgs-q').focus();return;}
+    st('done'); $('imgs-q').value=out[0].t;
+    out.forEach(function(o,i){var b=document.createElement('button');b.type='button';b.className='imgs-chip'+(i===0?' on':'');
+      b.innerHTML='<b></b>'+(o.p?'<small></small>':'');b.querySelector('b').textContent=o.t;if(o.p)b.querySelector('small').textContent=Math.round(o.p*100)+'%';
+      b.onclick=function(){go(o.q)};g.appendChild(b);});
+  }
+  function shrink(img){ /* max 640px JPEG, enough to recognise a product */
+    var k=Math.min(1,640/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c.toDataURL('image/jpeg',0.82);
+  }
+  function onDevice(img){
+    st(model?'think':'load');
+    return ready().then(function(){st('think');return new Promise(function(ok){setTimeout(ok,30)})}).then(function(){
+      var p=classify(img), idx=Array.prototype.slice.call(p).map(function(v,i){return [v,i]}).sort(function(a,b){return b[0]-a[0]}).slice(0,8);
+      var seen={}, mapped=[], raw=[];
+      idx.forEach(function(x){
+        var lab=labels[x[1]]||'', first=lab.split(',')[0].trim();
+        var key=Object.keys(M).find(function(k){return lab.indexOf(k)===0||first===k});
+        if(key){var m=M[key];if(!m[0]||seen[m[0]])return;seen[m[0]]=1;mapped.push({q:m[0],t:LG==='ar'?m[1]:LG==='fr'?m[2]:m[0],p:x[0]});}
+        else if(x[0]>0.25&&LG==='en'){raw.push({q:first,t:first,p:x[0]});}
+      });
+      chips(mapped.concat(raw).slice(0,4));
+    });
+  }
+  function handle(file){
+    if(!file)return;
+    var url=URL.createObjectURL(file), img=$('imgs-prev');
+    $('imgs-stage').hidden=false; $('imgs-guess').innerHTML=''; img.src=url; st('think');
+    new Promise(function(ok){if(img.complete&&img.naturalWidth)ok();else img.onload=ok;}).then(function(){
+      return fetch('/api/vision/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lang:LG,img:shrink(img)})})
+        .then(function(r){if(r.status!==200)throw 0;return r.json()})
+        .then(function(j){
+          if(!j.ok){chips([]);return;}
+          chips(j.items.map(function(x){return {q:x.q,t:x.name||x.q}}));
+        })
+        .catch(function(){return onDevice(img)});
+    }).catch(function(){st('fail');$('imgs-q').focus();});
+  }
+  ['imgs-cam','imgs-file'].forEach(function(id){var x=$(id);if(x)x.addEventListener('change',function(){handle(x.files&&x.files[0]);x.value='';})});
+  $('imgs-form').addEventListener('submit',function(ev){ev.preventDefault();var v=$('imgs-q').value;
+    var on=document.querySelector('.imgs-chip.on b'); if(on&&on.textContent===v){var c=document.querySelector('.imgs-chip.on');c.click();return;} go(v);});
+  document.addEventListener('click',function(ev){var b=ev.target.closest('[data-imgs]');if(!b)return;ev.preventDefault();
+    $('imgs-stage').hidden=true;$('imgs-q').value='';open(I);ready().catch(function(){});});
+})();

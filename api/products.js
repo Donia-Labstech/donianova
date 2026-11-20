@@ -61,7 +61,18 @@ const NICHES = {
   btreceiver:'bluetooth 5.3 audio receiver transmitter',
   carplay:   'wireless carplay android auto adapter',
   wifi:      'USB WiFi adapter dual band 5GHz',
-  extender:  'WiFi range extender repeater'
+  extender:  'WiFi range extender repeater',
+  // 🔥 trending: what buyers want most right now
+  smartring: 'smart ring health tracker sleep heart rate',
+  dashcam:   'dash cam front rear 4K wifi',
+  seccam:    'wifi security camera outdoor 4MP night vision',
+  ledstrip:  'smart LED strip lights RGB app music',
+  carvac:    'cordless car vacuum cleaner portable powerful',
+  gamepad:   'wireless game controller bluetooth phone PC',
+  massager:  'massage gun deep tissue portable',
+  trimmer:   'hair trimmer men cordless professional',
+  toothbrush:'sonic electric toothbrush rechargeable',
+  neckfan:   'portable neck fan rechargeable bladeless'
 };
 
 // Never list spy / covert-surveillance gear (illegal in many countries, against our values)
@@ -71,6 +82,16 @@ const BANNED = /\bspy\b|hidden (camera|recorder)|covert|eavesdrop|wiretap|bug de
 const ACCESSORY = /enclosure|case|adapter|caddy|حافظة|علبة|الضميمة|محول|صندوق|غلاف|حاوية/i;
 const WIRED = /\bwired\b|(?<!لا)سلكي/i;
 const RULES = {
+  smartring:{ min: 15, keep: /ring|خاتم/i, drop: /sizer|charger only|case|box|مقاس/i },
+  dashcam:  { min: 15, drop: /mount|holder|cable|card only|حامل|كابل/i },
+  seccam:   { min: 12, drop: /\bspy\b|hidden|mini spy|bracket|mount only|حامل/i },
+  ledstrip: { min: 4, keep: /led|strip|light|شريط|إضاءة|اضاءة/i },
+  carvac:   { min: 12, keep: /vacuum|مكنسة/i, drop: /filter|hepa|brush head|nozzle|فلتر/i },
+  gamepad:  { min: 8, keep: /controller|gamepad|joystick|يد تحكم|ذراع/i, drop: /trigger|grip only|skin|sticker|case|cap|غطاء/i },
+  massager: { min: 12, keep: /massage|massager|مدلك|تدليك/i, drop: /head only|heads|attachment|رؤوس/i },
+  trimmer:  { min: 6, keep: /trimmer|clipper|shaver|ماكينة|حلاقة|تشذيب/i, drop: /blade only|replacement|guard comb|شفرة بديلة/i },
+  toothbrush:{ min: 8, keep: /toothbrush|فرشاة/i, drop: /head|heads|replacement|رؤوس|بديلة/i },
+  neckfan:  { min: 5, keep: /fan|مروحة/i },
   qrscan:   { min: 12, keep: /scanner|reader|ماسح|قارئ/i, drop: /\bwired\b|stand only|holder only|cradle only/i },
   ringscan: { min: 15, keep: /ring|finger|wearable|خاتم|إصبع|اصبع/i },
   wmouse:   { min: 4, drop: /pad\b|mat\b|mouse ?pad|\bwired\b|لوحة ماوس|(?<!لا)سلكي/i },
