@@ -1,0 +1,48 @@
+[
+ {
+  "slug": "dash-cam-buying-guide",
+  "date": "2026-11-20",
+  "deals": "dashcam",
+  "picks": [],
+  "ar": {
+   "title": "كيف تختار كاميرا السيارة (داش كام)؟ دليل 2026 الصادق",
+   "card": "كيف تختار كاميرا السيارة؟",
+   "cardp": "الدقة الحقيقية، الكاميرا الخلفية، التخزين والحرارة: ما يهم فعلاً قبل الشراء.",
+   "lead": "كاميرا السيارة شاهدك الصامت على الطريق: في حادث أو خلاف مع سائق آخر تصبح لقطاتها دليلك. لكن السوق مليء بأرقام مبالغ فيها. هذا الدليل يشرح ما يهم فعلاً، وما نتجنّبه، ولمن تناسب كل فئة.",
+   "sections": [
+    ["لماذا تحتاج كاميرا سيارة؟", ["تسجّل الطريق باستمرار، وعند وقوع حادث تحفظ المقطع تلقائياً بفضل حساس الصدمات (G-sensor).", "تفيدك في إثبات المسؤولية، وفي تذكّر ما حدث بدقة، وأحياناً في مراقبة السيارة وهي متوقفة.", "تنبيه: قوانين التصوير ونشر المقاطع تختلف من بلد لآخر، فتأكّد منها قبل نشر أي فيديو يظهر فيه أشخاص أو لوحات سيارات."]],
+    ["الدقة: لا تنخدع بالرقم وحده", ["• 1080p تكفي أغلب الناس، و2K أو 4K تساعد على قراءة لوحات السيارات من مسافة أبعد.", "• الأهم من الرقم هو جودة المستشعر والعدسة: ابحث عن اسم المستشعر في الوصف (مثل Sony STARVIS) وعن مقاطع ليلية حقيقية في التقييمات.", "• كثير من الكاميرات الرخيصة تكتب «4K» وتسجّل فعلياً بدقة أقل بعد التكبير البرمجي، لذلك نعتمد على مقاطع المشترين لا على العنوان."]],
+    ["أمامية فقط أم أمامية وخلفية؟", ["• الأمامية وحدها: أرخص وأسهل تركيباً، وتكفي للتنقل اليومي.", "• أمامية وخلفية: تحميك أيضاً عند الاصطدام من الخلف، وهو من أكثر الحوادث شيوعاً في الزحام.", "• للسائقين المحترفين وسيارات الأجرة توجد طرازات بكاميرا داخلية ثالثة."]],
+    ["التخزين والحرارة: سبب أغلب الأعطال", ["• استعمل بطاقة ذاكرة من نوع High Endurance مصمّمة للتسجيل المستمر، فالبطاقات العادية تتلف بسرعة.", "• السعة المناسبة 64 إلى 128 جيغابايت، والكاميرا تمسح الأقدم تلقائياً (تسجيل حلقي).", "• في الصيف الحار تحت الزجاج، المكثّف الفائق (Supercapacitor) يتحمّل الحرارة أفضل من البطارية الصغيرة، فابحث عنه في المواصفات."]],
+    ["مواصفات مفيدة ولكن ليست ضرورية", ["• واي فاي وتطبيق هاتف: لتنزيل المقاطع بسهولة دون نزع البطاقة.", "• GPS: يسجّل السرعة والموقع مع الفيديو.", "• وضع المراقبة أثناء الوقوف: يحتاج غالباً سلك توصيل مباشر بنظام الكهرباء، فكلّف به فنياً إن لم تكن متأكداً."]],
+    ["ما الذي نتجنّبه عند الاختيار؟", ["• عناوين مليئة بالمواصفات المتناقضة أو بدقة «8K» في كاميرا رخيصة جداً.", "• المنتجات دون مقاطع حقيقية في التقييمات، أو بتقييم أقل من 85%.", "• الكاميرات التي تُسوَّق للتصوير الخفي للأشخاص: لا نعرضها إطلاقاً."]]
+   ],
+   "faq": [
+    ["هل تكفي دقة 1080p؟", "نعم لأغلب السائقين، خاصة مع مستشعر جيد. اختر 2K أو 4K إن كنت تريد قراءة اللوحات من بعيد أو تقود كثيراً في الليل."],
+    ["أي بطاقة ذاكرة أختار؟", "بطاقة High Endurance من ماركة معروفة بسعة 64 أو 128 جيغابايت، وتأكّد من الحد الأقصى الذي تدعمه الكاميرا."],
+    ["هل تستنزف الكاميرا بطارية السيارة؟", "في التشغيل العادي لا، لأنها تعمل مع تشغيل المحرك. وضع المراقبة أثناء الوقوف قد يستهلك البطارية إن لم يكن معه سلك يحمي من التفريغ."],
+    ["هل التركيب صعب؟", "التركيب الأساسي سهل: لاصق على الزجاج وكابل إلى ولاعة السيارة أو منفذ USB. التوصيل المباشر بالكهرباء يفضَّل تركه لفني."]
+   ]
+  },
+  "en": {
+   "title": "How to choose a dash cam: an honest 2026 guide",
+   "card": "How to choose a dash cam",
+   "cardp": "Real resolution, rear camera, storage and heat: what actually matters before you buy.",
+   "lead": "A dash cam is your silent witness on the road: after an accident or a dispute with another driver, its footage becomes your evidence. But the market is full of inflated numbers. This guide explains what really matters, what we avoid, and who each type suits.",
+   "sections": [
+    ["Why get a dash cam?", ["It records the road continuously, and after a collision its G-sensor locks the clip automatically.", "It helps prove who was at fault, helps you remember exactly what happened, and some models can watch the car while it is parked.", "Note: rules on recording and sharing footage differ between countries, so check them before posting any video that shows people or number plates."]],
+    ["Resolution: do not trust the number alone", ["• 1080p is enough for most people; 2K or 4K helps read number plates from further away.", "• Sensor and lens quality matter more than the number: look for the sensor name in the listing (such as Sony STARVIS) and for real night clips in the reviews.", "• Many cheap cameras say \"4K\" but really record at a lower resolution that is upscaled, so we trust buyers' clips, not the title."]],
+    ["Front only, or front and rear?", ["• Front only: cheaper and easier to install, fine for daily driving.", "• Front and rear: also covers you when someone hits you from behind, one of the most common accidents in traffic.", "• For professional drivers and taxis there are models with a third, cabin-facing camera."]],
+    ["Storage and heat: the cause of most failures", ["• Use a High Endurance memory card made for continuous recording; ordinary cards wear out quickly.", "• 64 to 128 GB is the right size, and the camera overwrites the oldest clips automatically (loop recording).", "• In hot summers behind the windscreen, a supercapacitor copes with heat better than a small battery, so look for it in the specs."]],
+    ["Useful but not essential features", ["• Wi-Fi and a phone app: download clips easily without removing the card.", "• GPS: records speed and location with the video.", "• Parking mode: usually needs a hardwire kit to the car's electrics, so ask a technician if you are not sure."]],
+    ["What we avoid when choosing", ["• Titles full of contradictory specs, or \"8K\" on a very cheap camera.", "• Products with no real footage in the reviews, or rated under 85%.", "• Cameras marketed for secretly filming people: we never list them."]]
+   ],
+   "faq": [
+    ["Is 1080p enough?", "Yes for most drivers, especially with a good sensor. Choose 2K or 4K if you want to read plates from far away or drive a lot at night."],
+    ["Which memory card should I pick?", "A High Endurance card from a known brand, 64 or 128 GB, and check the maximum size your camera supports."],
+    ["Will a dash cam drain my car battery?", "Not in normal use, because it runs only while the engine is on. Parking mode can drain the battery unless the hardwire kit has low-voltage protection."],
+    ["Is installation difficult?", "Basic installation is easy: an adhesive mount on the windscreen and a cable to the cigarette lighter or a USB port. Hardwiring is best left to a technician."]
+   ]
+  }
+ }
+]

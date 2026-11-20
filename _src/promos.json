@@ -1,0 +1,21 @@
+{
+ "updated": "2026-11-20",
+ "source": "AliExpress Affiliate Program newsletter, 2026-11-18",
+ "campaigns": [
+  {
+   "id": "bf2026",
+   "start": "2026-11-19T08:00:00Z",
+   "end": "2026-12-04T07:59:59Z",
+   "name": {"ar": "بلاك فرايداي وسايبر مانداي", "en": "Black Friday & Cyber Monday", "fr": "Black Friday & Cyber Monday"},
+   "benefit": {"ar": "خصومات حتى 80% على علي إكسبريس", "en": "Up to 80% off on AliExpress", "fr": "Jusqu'à -80 % sur AliExpress"},
+   "regions": {
+    "global": {"cur": "$", "codes": [["OTSBF03",15,3],["OTSBF04",24,4],["OTSBF08",60,8],["OTSBF19",115,19],["OTSBF34",209,34],["OTSBF50",305,50],["OTSBF66",405,66]]},
+    "gcc": {"start": "2026-11-18T21:00:00Z", "end": "2026-11-29T20:59:59Z",
+            "name": {"ar": "الجمعة البيضاء (سوبر فرايداي)", "en": "Super Friday", "fr": "Super Friday"},
+            "cur": "SAR", "codes": [["GCC19",132,19],["GCC57",342,57],["GCC92",516,92],["GCC118",745,118],["GCC152",1007,152],["GCC209",1300,209],["GCC301",1898,301],["GCC380",2318,380]]},
+    "fr": {"start": "2026-11-18T23:00:00Z", "end": "2026-12-03T22:59:59Z", "cur": "€",
+           "codes": [["11FRBF03",18,3],["11FRBF06",46,6],["11FRBF13",79,13],["11FRBF23",149,23],["11FRBF40",235,40],["11FRBF60",350,60],["11FRBF76",469,76]]}
+   }
+  }
+ ]
+}
